@@ -31,7 +31,7 @@ const LoginPage = ()  => {
 
     return(
     <section
-   className = "w-[100%] p-10 flex  flex-col items-center justify-center gap-5 bg-[url('/loginBG.png')]"
+   className = "w-[100%] p-10 flex  flex-col items-center justify-center gap-5 bg-[url('/assets/loginBG.png)]"
     >
         <motion.div
         initial = {{opacity: 0, x: -100}}
