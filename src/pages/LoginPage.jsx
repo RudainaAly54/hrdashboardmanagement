@@ -31,7 +31,7 @@ const LoginPage = ()  => {
 
     return(
     <section
-   className = "w-[100%] p-10 flex  flex-col items-center justify-center gap-5"
+   className = "w-[100%] p-10 flex  flex-col items-center justify-center gap-5 bg-[url('/loginBG.png')]"
     >
         <motion.div
         initial = {{opacity: 0, x: -100}}
@@ -39,8 +39,8 @@ const LoginPage = ()  => {
         trasntion = {{duration: 0.8}}
         className = {className}
         >
-            <div  className="w-16 h-16 bg-[#639987] rounded-xl flex items-center justify-center shadow-lg shadow-[#2C2C2E] hover:bg-[#A8C3B9] transition-all duration-300">
-                <FaHeartPulse style=  {{color: '#F9F9F8'}} size = {36}/>
+            <div  className="w-16 h-16 bg-[#639987] rounded-xl flex items-center justify-center shadow-lg shadow-[#2C2C2E] hover:bg-[#A8C3B9] transition-all duration-300 mb-2">
+                <FaHeartPulse style=  {{color: '#F9F9F8'}} size = {32}/>
             </div>
             <h1 className = "text-5xl font-[manrope]">ElevateHR</h1>
             <p className = "text-gray-500 text-md font-[inter]">Enterprise People Managememt</p>
