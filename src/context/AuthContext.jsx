@@ -32,18 +32,29 @@ export const AuthProvider= ({children}) => {
         return () => listener.subscription.unsubscribe();
     },[])
 
-    const login = (email, password) => 
-        supabase.auth.signInWithPassword({email, password});
+    //  lOGIN & LOGOUT
+   const login = (email, password) => 
+    supabase.auth.signInWithPassword({email, password});
 
-        const logout = () => supabase.auth.signOut();
-    
-        return (
-            <AuthContext.Provider
-            value={{user, profile, loading, login, logout}}
-            >
-                {children}
-            </AuthContext.Provider>
-        )
+const logout = () => supabase.auth.signOut();
+
+
+
+const resetPassword = (email) =>
+    supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+const updatePassword = (newPassword) =>
+    supabase.auth.updateUser({ password: newPassword });
+
+return (
+    <AuthContext.Provider
+    value={{user, profile, loading, login, logout,  resetPassword, updatePassword}}
+    >
+        {children}
+    </AuthContext.Provider>
+)
 }
 
 export const useAuth = () => useContext(AuthContext);

@@ -6,7 +6,8 @@ const ProtectedRoute = ({children, requiredRole}) => {
     const {user, profile, loading} = useAuth();
      if(loading)  return <LoadingSpinner/>;
     if(!user) return <Navigate to = "/login"/>;
-    if(requiredRole && profile?.role !== requiredRole) return <Navigate to= "/unauthorized" />; 
+    if(requiredRole && profile?.role !== requiredRole) return <Navigate to= "/unauthorized" />;
+    return children  
 }
 
 export default ProtectedRoute
