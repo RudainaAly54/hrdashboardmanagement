@@ -19,21 +19,21 @@ export const AuthProvider = ({ children }) => {
         setHrProfile(data ?? null);
     };
 
-    useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
-            if (session?.user) loadHrProfile(session.user.id);
-            setLoading(false);
-        });
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+        setUser(session?.user ?? null);
+        if (session?.user) loadHrProfile(session.user.id); 
+        setLoading(false);
+    });
 
-        const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-            if (session?.user) loadHrProfile(session.user.id);
-            else setHrProfile(null);
-        });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null);
+        if (session?.user) loadHrProfile(session.user.id); 
+        else setHrProfile(null);
+    });
 
-        return () => listener.subscription.unsubscribe();
-    }, []);
+    return () => listener.subscription.unsubscribe();
+}, []);
 
     const login = async (email, password) => {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
         const { data: hrRow, error: hrError } = await supabase
             .from('HRemp')
-            .select('id')
+            .select('HRid')
             .eq('auth_user_id', data.user.id)
             .single();
 

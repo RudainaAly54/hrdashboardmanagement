@@ -7,6 +7,7 @@ import { FaLock,FaArrowRight} from "react-icons/fa";
 import { CiMail } from "react-icons/ci";
 import { IoMdEye,  IoMdEyeOff} from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import loginBG from '../assets/loginBG.png'
  
 const LoginPage = ()  => {
     const [email, setEmail] = useState (' ');
@@ -22,16 +23,15 @@ const LoginPage = ()  => {
 
     const handleSubmit = async (e) => {
         e.preventDefault ();
-        const {error} = await login(e.target.email, e.target.password);
+        const {error} = await login(email, password);
         if(error) setError(error.message);
         else navigate('/dashboard')
-        console.log(email)
-        console.log(password)
+        
     }
 
     return(
     <section
-   className = "w-[100%] p-10 flex  flex-col items-center justify-center gap-5 bg-[url('/assets/loginBG.png)]"
+   className = "w-[100%] p-10 flex  flex-col items-center justify-center gap-5 bg-[url('/loginBG.png')] bg-cover bg-center h-screen"
     >
         <motion.div
         initial = {{opacity: 0, x: -100}}
@@ -51,6 +51,7 @@ const LoginPage = ()  => {
          initial = {{opacity: 0, x: -100}}
         whileInView = {{opacity: 1, x: 0}}
         trasntion = {{duration: 0.8}}
+        onSubmit={handleSubmit}
         className = {className}
         className = "bg-[#F9F9F8] w-1/2 md:w-1/4 p-5 rounded-2xl shadow-xl shadow-[#2C2C2E] flex flex-col gap-5 "
         >
@@ -101,7 +102,6 @@ const LoginPage = ()  => {
 
           <button
           type="submit"
-          onClick={handleSubmit}
           className="w-full h-10  bg-[#639987] rounded-xl text-[#F9F9F8] font-bold text-lg  flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all duration-300"
           >Sign In <FaArrowRight style={{color:"#F9F9F8"}} size={16}/></button>
         
