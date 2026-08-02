@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import {useAuth} from '../context/AuthContext'
 import { motion } from "framer-motion";
-import { FaHeartPulse } from "react-icons/fa6";
+import { IoMdPeople } from "react-icons/io";
 import { FaLock,FaArrowRight} from "react-icons/fa";
 import { CiMail } from "react-icons/ci";
 import { IoMdEye,  IoMdEyeOff} from "react-icons/io";
@@ -40,7 +40,7 @@ const LoginPage = ()  => {
         className = {className}
         >
             <div  className="w-16 h-16 bg-[#639987] rounded-xl flex items-center justify-center shadow-lg shadow-[#2C2C2E] hover:bg-[#A8C3B9] transition-all duration-300 mb-2">
-                <FaHeartPulse style=  {{color: '#F9F9F8'}} size = {32}/>
+                <IoMdPeople style=  {{color: '#F9F9F8'}} size = {32}/>
             </div>
             <h1 className = "text-5xl font-[manrope]">ElevateHR</h1>
             <p className = "text-gray-500 text-md font-[inter]">Enterprise People Managememt</p>
