@@ -242,7 +242,7 @@ className="flex items-center justify-between flex-wrap gap-4">
         </tr>
     </thead>
 
-    <tbody>
+    <tbody className={loading ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
 
         {loading ? (
             <tr>
@@ -251,7 +251,7 @@ className="flex items-center justify-between flex-wrap gap-4">
                     Loading Employees...
                 </td>
             </tr>
-        ):  employees.length === 0 ? (
+        ):  employees.length === 0 && !loading ? (
             <tr>
                <td colSpan={6} className="p-8 text-center text-gray-400">
 
@@ -298,6 +298,7 @@ className="flex items-center justify-between flex-wrap gap-4">
     })
 )}
     </tbody>
+    
 </table>
 
 <Pagination
