@@ -9,7 +9,7 @@ import MoreFiltersPanel from "../components/MoreFiltersPanel";
 import { motion } from "framer-motion"
 
 /* Hooks &Context */
-import  {useState, useEffect} from "react"
+import  {useState, useEffect, useRef} from "react"
 import {createClient} from "../lib/supabaseClient"
 import { useOutletContext } from "react-router-dom"
 
@@ -54,6 +54,7 @@ const toggleRow = (id) => {
 };
 
 const {search} = useOutletContext(); //Shared search term, owned by Layout Component
+const cacheRef = useRef(new Map());
 
 //1. reset to page 1 whenever the search term changes
 //Why 
@@ -67,6 +68,16 @@ useEffect( () => {
 //Run whenever page or search term changes
 useEffect(()=> {
     const fetchEmployees = async () => {
+        const cacheKey = JSON.stringify({ page, search, filters });
+
+        if (cacheRef.current.has(cacheKey)) {
+            const cached = cacheRef.current.get(cacheKey);
+            setEmployees(cached.data);
+            setTotalCount(cached.count);
+            setMessage("");
+            return;
+        }
+
         setLoading(true);
         setMessage("");
         const from = (page - 1) * PAGE_SIZE;
@@ -80,32 +91,26 @@ useEffect(()=> {
 
         if(search)
             query = query.ilike("fullName", `%${search}%`)
-/* 
-SQL 
-select * 
-from Employees 
-where fullName like "a%"
-*/
 
-if (filters.deptName) query = query.eq("deptName", filters.deptName);
+        if (filters.deptName) query = query.eq("deptName", filters.deptName);
         if (filters.status) query = query.eq("status", filters.status);
         if (filters.city) query = query.eq("city", filters.city);
 
-const {data, error, count} = await query;
+        const {data, error, count} = await query;
 
-if(error) {
-    console.error("Error fetching employees: ", error)
-    setMessage(error.message || "An error occured while fetching employees data");
-    setEmployees([]);
-}else{
-setEmployees(data)
-setTotalCount(count ?? 0)
-}
-setLoading(false)
+        if(error) {
+            console.error("Error fetching employees: ", error)
+            setMessage(error.message || "An error occured while fetching employees data");
+            setEmployees([]);
+        }else{
+            setEmployees(data)
+            setTotalCount(count ?? 0)
+            cacheRef.current.set(cacheKey, { data, count: count ?? 0 });
+        }
+        setLoading(false)
     };
     fetchEmployees();
 }, [page, search, filters]);
-
 //3. Summary Card count 
 //Fetches only the count not the row data
 //This reflects the WHOLE table, not just 5 rows are on the current page
@@ -244,7 +249,7 @@ className="flex items-center justify-between flex-wrap gap-4">
 
     <tbody className={loading ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
 
-        {loading ? (
+       {loading && employees.length === 0 ? (
             <tr>
                 <td colSpan={6} className="p-8 text-center text-gray-400">
 

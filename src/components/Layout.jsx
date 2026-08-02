@@ -11,7 +11,7 @@ const Layout = () => {
             <Sidebar />
             <div className="flex-1 flex flex-col min-h-full">
                 <Header search={search} onSearchChange={setSearch} headerTitle="Employee Management" />
-                <main className="flex-1  p-6 overflow-y-automin-h-0">
+                <main className="flex-1  p-6 ">
                     <Outlet context={{ search, setSearch }} />
                 </main>
             </div>
