@@ -40,6 +40,19 @@ const [page, setPage] = useState(1);
 const[loading, setLoading] = useState(true);
 const [message, setMessage] = useState("");
 
+
+// In Employees.jsx, alongside your other state:
+const [selectedIds, setSelectedIds] = useState(new Set());
+
+const toggleRow = (id) => {
+    setSelectedIds(prev => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+    });
+};
+
 const {search} = useOutletContext(); //Shared search term, owned by Layout Component
 
 //1. reset to page 1 whenever the search term changes
@@ -106,7 +119,7 @@ useEffect(() => {
         const {count: onLeave} = await supabase
         .from(TABLE_NAME)
         .select("*", {count: "exact", head: true})
-        .eq("status", "onLeave")
+        .eq("status", "On Leave")
         /* 
         SQL 
         select *, count(id)
@@ -246,50 +259,44 @@ className="flex items-center justify-between flex-wrap gap-4">
                 </td>
             </tr>
         ): (
+    employees.map((emp) => {
+        const isChecked = selectedIds.has(emp.id);
 
-        employees.map((emp) => (
-       
-            <tr key = {emp.id}
-            className="border-b last:border-0 hover:bg-gray-50 transition"
-            >
-             
-                <td className="p-4 flex items-center gap-10">
-                 <input type="checkbox"  className="h-5 w-5 accent-[#A8C3B9]"/>
+        return (
+            <tr key={emp.id} 
+            className = {`${isChecked ? 'bg-[rgba(168,195,185,0.1)]' : " "} border-b last:border-0  transition`}>
+                <td className= "p-4 flex items-center gap-10">
+                    <input
+                        type="checkbox"
+                        className="h-5 w-5 accent-[#A8C3B9]"
+                        onChange={() => toggleRow(emp.id)}
+                        checked={isChecked}
+                    />
                     <div className="flex items-center gap-3">
-                     
-                        <img src={emp.photoUrl} alt= {emp.fullName} 
-                        className="w-9 h-9 rounded-full object-cover"
-                        />
-                  
-                    <div>
-                         <p className="font-medium">{emp.fullName}</p>
-                           <p className="text-xs text-gray-400">{emp.email}</p>
-                </div>
-                  </div>
+                        <img src={emp.PhotoUrl} alt={emp.fullName} className="w-9 h-9 rounded-full object-cover" />
+                        <div>
+                            <p className="font-medium">{emp.fullName}</p>
+                            <p className="text-xs text-gray-400">{emp.email}</p>
+                        </div>
+                    </div>
                 </td>
-
                 <td className="p-4">{emp.deptName}</td>
                 <td className="p-4">
-                    {emp.joinDate ?
-                new Date(emp.joinDate) .toLocaleDateString('en-US', {
-                    month: "short",
-                    day:"numeric",
-                    year : "numeric"
-                }) : "--"
-                }
+                    {emp.joinDate
+                        ? new Date(emp.joinDate).toLocaleDateString('en-US', { month: "short", day: "numeric", year: "numeric" })
+                        : "--"}
                 </td>
-
                 <td className="p-4">{emp.role}</td>
                 <td className="p-4">
-                    <StatusBadge status={emp.status}/>
+                    <StatusBadge status={emp.status} />
                 </td>
-
                 <td className="p-4">
-                    <button className="text-gray-400 hover:text-gray-700"><BsThreeDotsVertical/></button>
+                    <button className="text-gray-400 hover:text-gray-700"><BsThreeDotsVertical /></button>
                 </td>
             </tr>
-        )) 
-        ) }
+        );
+    })
+)}
     </tbody>
 </table>
 
