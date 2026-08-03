@@ -3,6 +3,7 @@ import StatusBadge from "../components/StatusBadge"
 import Pagination from "../components/Pagination"
 import QuickFilters from "../components/QuickFilters";
 import MoreFiltersPanel from "../components/MoreFiltersPanel";
+import AddEmployeeModal  from '../components/AddEmployeeModal';
 
 
 /* Libraries */
@@ -12,6 +13,8 @@ import { motion } from "framer-motion"
 import  {useState, useEffect, useRef} from "react"
 import {createClient} from "../lib/supabaseClient"
 import { useOutletContext } from "react-router-dom"
+import {downloadCSV} from '../lib/downloadCSV'
+import { useToast } from "../context/ToastContext";
 
 /* Icons */
 import { FiDownload, FiPlus } from "react-icons/fi";
@@ -41,7 +44,11 @@ const[loading, setLoading] = useState(true);
 const [message, setMessage] = useState("");
 
 
-// In Employees.jsx, alongside your other state:
+const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+const [exporting, setExporting] = useState("");
+
+const [refreshKey, setRefreshKey] = useState(0);
+
 const [selectedIds, setSelectedIds] = useState(new Set());
 
 const toggleRow = (id) => {
@@ -55,6 +62,7 @@ const toggleRow = (id) => {
 
 const {search} = useOutletContext(); //Shared search term, owned by Layout Component
 const cacheRef = useRef(new Map());
+const {showToast} = useToast();
 
 //1. reset to page 1 whenever the search term changes
 //Why 
@@ -144,10 +152,55 @@ setNewHiresCount(newHires ?? 0);
     };
 
     fetchSummaryCounts()
-}, [])
+}, [refreshKey])
 
 const  totalPage = Math.max(1, Math.ceil(totalCount /PAGE_SIZE))
+
+const handleExportCSV = async () => {
+    setExporting(true)
+
+    try {
+        let query = supabase
+        .from(TABLE_NAME)
+        .select("*")
+        .order("fullName", {ascending:true});
+
+        if(search) query = query.ilike("fullName", `%${search}%`);
+        if(filters.deptName) query = query.eq("deptName", filters.deptName);
+        if(filters.status) query = query.eq("status", filters.status);
+        if(filters.city) query = query.eq("city", filters.city);
+
+        const {data, error} = await query
+        if(error) throw error
+
+        if(!data || data.length ===0) {
+            setMessage("No employees to export")
+            showToast("No employees to export", "error")
+            return
+        }
+
+        const stamp = new Date().toISOString().slice(0, 10)
+        downloadCSV(data, `employees_${stamp}.csv`);
+        showToast(`Exported ${data.length} employees to CSV`, "success")
+    }  catch (err) {
+        console.error ("Error Exporting Employees", err)
+        setMessage(err.message || "something went wrong while exporting");
+        showToast("Export failed - please try again", "error");
+    }finally {
+        setExporting(false);
+    }
+
+}
+
+const handleEmployeeAdded = () => {
+    setIsAddModalOpen(false)
+    cacheRef.current.clear();
+    setPage(1)
+    setRefreshKey((k) => k +1)
+    showToast("Employee added succefully!", "success");
+}
 return (
+    <>
 <motion.section
 initial = {{opacity: 0, y: 10}}
 animate = {{opacity: 1, y: 0}}
@@ -166,11 +219,16 @@ className="flex items-center justify-between flex-wrap gap-4">
             </p>
     </div>
     <div className="flex gap-3">
-        <button className="flex items-center gap-2 px-4 py-2 border-gray-200 rounded-lg text-sm font-medium hover: bg-gray-50 transition">
-            <FiDownload size={16}/> Export CSV 
+        <button 
+        onClick={handleExportCSV}
+        disabled = {exporting}
+        className="flex items-center gap-2 px-4 py-2 border-gray-600 rounded-lg text-[#f9f9f8] text-sm font-medium bg-[#2C2C2E] hover:bg-gray-500 transition">
+            <FiDownload size={16}/> {exporting ? "Exporting...": "Export CSV"} 
         </button>
 
-        <button className="flex items-center gap-2 px-4 py-2 bg-[#639987] text-[#F9F9F8] rounded-lg text-sm font-medium hover:bg-[#557f0] transition">
+        <button 
+        onClick={() => setIsAddModalOpen(true)}
+        className="flex items-center gap-2 px-4 py-2 bg-[#639987] text-[#F9F9F8] rounded-lg text-sm font-medium hover:bg-[#A8C3B9] transition">
             <FiPlus size={16}/> Add Employee
         </button>
     </div>
@@ -315,6 +373,13 @@ onPageChange={setPage}
 />
 </div>
 </motion.section>
+
+<AddEmployeeModal
+isOpen = {isAddModalOpen}
+onClose ={() => setIsAddModalOpen(false)}
+onSuccess = {handleEmployeeAdded}
+/>
+</>
 )
 }
 
