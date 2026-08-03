@@ -51,6 +51,8 @@ const [refreshKey, setRefreshKey] = useState(0);
 
 const [selectedIds, setSelectedIds] = useState(new Set());
 
+
+
 const toggleRow = (id) => {
     setSelectedIds(prev => {
         const next = new Set(prev);
@@ -199,6 +201,26 @@ const handleEmployeeAdded = () => {
     setRefreshKey((k) => k +1)
     showToast("Employee added succefully!", "success");
 }
+
+const handleDelete = async (id) => {
+
+  const {data, error}= await supabase 
+  .from(TABLE_NAME)
+  .delete()
+  .eq('id', id)
+  .select();
+
+  showToast("Employee deleted successfully", "success");
+
+  if(error) {
+    showToast("Couldn't delete employee", "error");
+console.error(error.message)
+}
+
+  setEmployees(data)
+
+}
+
 return (
     <>
 <motion.section
@@ -354,7 +376,29 @@ className="flex items-center justify-between flex-wrap gap-4">
                     <StatusBadge status={emp.status} />
                 </td>
                 <td className="p-4">
-                    <button className="text-gray-400 hover:text-gray-700"><BsThreeDotsVertical /></button>
+                { isChecked  ? 
+                (
+                  <div className="flex gap-2">
+                     <button 
+                     onClick={handleDelete}
+                     className="bg-red-600 text-white font-bold hover:bg-red-400 border border-red-500 rounded-xl px-1 h-10 cursor-pointer">
+                        Delete
+                        </button>
+
+                         <button 
+                     
+                     className="bg-[#639987] text-white font-bold hover:bg-[#b8d5cb] border border-[#6fac97] rounded-xl p-3 h-10 flex items-cente cursor-pointerr">
+                        Edit
+                        </button>
+                  </div>
+                )
+                : (
+                           <div 
+                    className="text-gray-400 hover:text-gray-700 cursor-none">
+                        <BsThreeDotsVertical />
+                        </div> 
+                )                 
+                }
                 </td>
             </tr>
         );
