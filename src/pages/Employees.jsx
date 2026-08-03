@@ -208,16 +208,15 @@ const handleDelete = async (id) => {
   .from(TABLE_NAME)
   .delete()
   .eq('id', id)
-  .select();
 
   showToast("Employee deleted successfully", "success");
+
+  cacheRef.current.set(data)
 
   if(error) {
     showToast("Couldn't delete employee", "error");
 console.error(error.message)
 }
-
-  setEmployees(data)
 
 }
 
@@ -380,7 +379,7 @@ className="flex items-center justify-between flex-wrap gap-4">
                 (
                   <div className="flex gap-2">
                      <button 
-                     onClick={handleDelete}
+                     onClick={() =>handleDelete(emp.id)}
                      className="bg-red-600 text-white font-bold hover:bg-red-400 border border-red-500 rounded-xl px-1 h-10 cursor-pointer">
                         Delete
                         </button>
