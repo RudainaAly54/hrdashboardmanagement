@@ -1,24 +1,64 @@
-import supabase from './supabaseClient';
+import { filter } from 'framer-motion/m';
+import {createClient} from './supabaseClient';
 
- const createCrud = (tableName) => {
+const supabase = createClient(); 
+
+const createCrud = (tableName) => {
     return { 
         //Read All Records.
         //Filters / Order => Optional
-       getAll: async ({ orderBy, ascending = true, filters = {} } = {}) => {
-      let query = supabase.from(tableName).select("*");
+       getAll: async ({ orderBy, ascending = true, filters = {}, selectQuery = "*" } = {}) => {
+    let query = supabase.from(tableName).select(selectQuery);
 
-      Object.entries(filters).forEach(([key, value]) => {
+    Object.entries(filters).forEach(([key, value]) => {
         query = query.eq(key, value);
-      });
+    });
 
-      if (orderBy) query = query.order(orderBy, { ascending });
+    if (orderBy) query = query.order(orderBy, { ascending });
 
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
+    const { data, error } = await query;
+    if (error) throw error;
+    return data;
+},
 
-    // Read Specific Record by ID
+
+
+    //Paginated read - search / pagination
+ // Read Specific Record by ID
+getPage : async({
+    page = 1, 
+    pageSize = 10,
+    orderBy, 
+    ascending = true, 
+    filters = {},
+    searchColumn, 
+    searchTerm,
+    selectQuery = "*"
+} = {}) => {
+    const from = (page -1) * pageSize;
+    const to = from + pageSize -1
+
+    let query = supabase
+    .from(tableName)
+    .select(selectQuery, {count: "exact"})
+    .range(from, to);
+
+    if(orderBy) query = query.order(orderBy, {ascending});
+    if(searchTerm && searchColumn) query = query.ilike(searchColumn, `%${searchTerm}%`);
+
+    Object.entries(filters).forEach(([key, value]) => {
+        if(value !== null &&  value !==undefined && value !== "") {
+            query = query.eq(key, value);
+        }
+    });
+
+    const {data, error, count} = await query;
+
+    if(error) throw error;
+    return {data, count: count ?? 0};
+},
+
+
     getById : async (id, idColumn = "id") => {
         const {data, error}  = await supabase
         .from(tableName)
@@ -62,7 +102,24 @@ import supabase from './supabaseClient';
 
         if(error) throw error;
         return true;
-    }
+    },
+
+
+    //Count => Summarizes
+   count: async (filters = {}) => {
+    let query = supabase
+    .from(tableName)
+    .select("*", { count: "exact", head: true });
+
+    Object.entries(filters).forEach(([key, value]) => {
+        query = query.eq(key, value);
+    });
+
+    const { count, error } = await query;
+    if (error) throw error;
+    return count ?? 0;
+},
+
     }
 }
 
