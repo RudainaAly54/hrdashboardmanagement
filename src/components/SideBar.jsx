@@ -58,7 +58,7 @@ const SideBar = () => {
     animate={{ width: isHovered ? 256 : 80 }}
     transition={{ duration: 0.3, ease: "easeInOut" }}
     className={`
-        bg-[#2C2C2E] fixed top-0 left-0 h-screen p-5 flex flex-col gap-5 shadow-lg shadow-[#2C2C2E] z-50
+        bg-[#2C2C2E] fixed  h-screen top-0 left-0 p-5 flex flex-col gap-5 shadow-lg shadow-[#2C2C2E]
         w-64 transition-transform duration-300 
                ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:!w-auto

@@ -7,13 +7,13 @@ const Layout = () => {
     const [search, setSearch] = useState("");
 
     return (
-        <div className="flex h-screen ml-20">
-            <Sidebar />
-            <div className="flex-1 flex flex-col min-h-full">
+        <div className="flex h-full max-w-screen  md:ml-20">
+           <Sidebar />
+            <div className="flex-1 flex flex-col ">
                 <Header search={search} onSearchChange={setSearch} headerTitle="Employee Management" />
-                <main className="flex-1  p-6 ">
+                <div className="flex-1  p-6 ">
                     <Outlet context={{ search, setSearch }} />
-                </main>
+                </div>
             </div>
         </div>
     );

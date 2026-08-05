@@ -4,6 +4,8 @@ import Pagination from "../components/Pagination"
 import QuickFilters from "../components/QuickFilters";
 import MoreFiltersPanel from "../components/MoreFiltersPanel";
 import AddEmployeeModal  from '../components/AddEmployeeModal';
+import EditEmployeeModal from '../components/Editemployeemodal'
+import Layout from "../components/Layout";
 
 
 /* Libraries */
@@ -38,6 +40,7 @@ const [newHiresCount, setNewHiresCount] = useState(0);
 
 const [filters, setFilters] = useState({ deptName: null, status: null, city: null });
 const [isMoreFiltersOpen, setIsMoreFiltersOpen] = useState(false);
+const [selectedIds, setSelectedIds] = useState(new Set());
 
 const [page, setPage] = useState(1);
 const[loading, setLoading] = useState(true);
@@ -49,7 +52,10 @@ const [exporting, setExporting] = useState("");
 
 const [refreshKey, setRefreshKey] = useState(0);
 
-const [selectedIds, setSelectedIds] = useState(new Set());
+const [editingEmployee, setEditingEmployee] = useState(null);
+const [isEditingModalOpen, setIsEditingModalOpen] = useState(false)
+
+
 
 
 
@@ -121,6 +127,8 @@ useEffect(()=> {
     };
     fetchEmployees();
 }, [page, search, filters]);
+
+
 //3. Summary Card count 
 //Fetches only the count not the row data
 //This reflects the WHOLE table, not just 5 rows are on the current page
@@ -158,6 +166,8 @@ setNewHiresCount(newHires ?? 0);
 
 const  totalPage = Math.max(1, Math.ceil(totalCount /PAGE_SIZE))
 
+
+//Export handling
 const handleExportCSV = async () => {
     setExporting(true)
 
@@ -194,6 +204,8 @@ const handleExportCSV = async () => {
 
 }
 
+
+//Adding Employee
 const handleEmployeeAdded = () => {
     setIsAddModalOpen(false)
     cacheRef.current.clear();
@@ -202,23 +214,56 @@ const handleEmployeeAdded = () => {
     showToast("Employee added succefully!", "success");
 }
 
+
+//Deleting Employee
 const handleDelete = async (id) => {
 
-  const {data, error}= await supabase 
+  const {count , error}= await supabase 
   .from(TABLE_NAME)
-  .delete()
+  .delete({count: "exact"})
   .eq('id', id)
-
-  showToast("Employee deleted successfully", "success");
-
-  cacheRef.current.set(data)
 
   if(error) {
     showToast("Couldn't delete employee", "error");
 console.error(error.message)
 }
 
+  if (!count) {
+    showToast("Employee not deleted — check permissions", "error");
+    return;
+  }
+
+
+setEmployees((prev) => prev.filter((emp) => emp.id !== id));
+  setTotalCount((prev) => Math.max(0, prev - 1));
+
+  cacheRef.current.clear();
+  setRefreshKey((k) => k + 1);
+
+  showToast("Employee deleted successfully", "success");
+};
+
+
+//Editing employee States
+const handleEditClick = (emp) => {
+    setEditingEmployee(emp);
+    setIsEditingModalOpen(true);
+};
+
+//Update employee
+const handleEmployeeUpdated = (updatedEmployee) => {
+    setEditingEmployee(null)
+    setIsEditingModalOpen(false)
+
+    //update the row in place, no refetch
+    setEmployees((prev) => prev.map((emp) =>( emp.id === updatedEmployee.id ? 
+updatedEmployee : emp)))
+
+cacheRef.current.clear();
+setRefreshKey(k => k+1)
+showToast("Employees updated successfully", "success")
 }
+
 
 return (
     <>
@@ -226,7 +271,7 @@ return (
 initial = {{opacity: 0, y: 10}}
 animate = {{opacity: 1, y: 0}}
 transition={{duration: 0.3}}
-className=" flex flex-col min-w-full h-full p-6   gap-5"
+className=" flex flex-col max-w-full h-full p-6   gap-5"
 >
 {/*   Page Header Row */}
 <div 
@@ -385,7 +430,7 @@ className="flex items-center justify-between flex-wrap gap-4">
                         </button>
 
                          <button 
-                     
+                     onClick={() => handleEditClick(emp)}
                      className="bg-[#639987] text-white font-bold hover:bg-[#b8d5cb] border border-[#6fac97] rounded-xl p-3 h-10 flex items-cente cursor-pointerr">
                         Edit
                         </button>
@@ -421,6 +466,16 @@ onPageChange={setPage}
 isOpen = {isAddModalOpen}
 onClose ={() => setIsAddModalOpen(false)}
 onSuccess = {handleEmployeeAdded}
+/>
+
+<EditEmployeeModal
+isOpen={isEditingModalOpen}
+employee={editingEmployee}
+onClose={() => {
+    setIsEditingModalOpen(false); 
+    setEditingEmployee(null)
+ }}
+ onSuccess={handleEmployeeUpdated}
 />
 </>
 )
