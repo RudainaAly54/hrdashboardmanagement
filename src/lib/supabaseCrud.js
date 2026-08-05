@@ -1,6 +1,6 @@
-import {supabase} from './supabaseClient';
+import supabase from './supabaseClient';
 
-export const createCrud = (tableName) => {
+ const createCrud = (tableName) => {
     return { 
         //Read All Records.
         //Filters / Order => Optional
@@ -65,3 +65,6 @@ export const createCrud = (tableName) => {
     }
     }
 }
+
+
+export default createCrud;

@@ -5,7 +5,7 @@ import QuickFilters from "../components/QuickFilters";
 import MoreFiltersPanel from "../components/MoreFiltersPanel";
 import AddEmployeeModal  from '../components/AddEmployeeModal';
 import EditEmployeeModal from '../components/Editemployeemodal'
-import Layout from "../components/Layout";
+
 
 
 /* Libraries */
@@ -425,13 +425,13 @@ className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex gap-2">
                      <button 
                      onClick={() =>handleDelete(emp.id)}
-                     className="bg-red-600 text-white font-bold hover:bg-red-400 border border-red-500 rounded-xl px-1 h-10 cursor-pointer">
+                     className="bg-red-600 text-white font-bold hover:bg-red-400 border border-red-500 rounded-xl px-1 h-10 flex items-center cursor-pointer">
                         Delete
                         </button>
 
                          <button 
                      onClick={() => handleEditClick(emp)}
-                     className="bg-[#639987] text-white font-bold hover:bg-[#b8d5cb] border border-[#6fac97] rounded-xl p-3 h-10 flex items-cente cursor-pointerr">
+                     className="bg-[#639987] text-white font-bold hover:bg-[#b8d5cb] border border-[#6fac97] rounded-xl p-3 h-10 flex items-center cursor-pointerr">
                         Edit
                         </button>
                   </div>

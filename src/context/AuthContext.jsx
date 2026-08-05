@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { createClient } from "../lib/supabaseClient"; // match your actual filename
+import { createClient } from "../lib/supabaseClient";// match your actual filename
 
 const supabase = createClient();
 
