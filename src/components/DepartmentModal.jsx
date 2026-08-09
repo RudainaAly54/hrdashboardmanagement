@@ -68,7 +68,7 @@ const DeparmentModal = ({
 
 
     // handle submit
-const handleSubmit = async (values) {
+const handleSubmit = async (values) => {
 const payload = {
     DeptName: values.DeptName.trim(),
     core: values.core, 

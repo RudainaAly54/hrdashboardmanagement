@@ -82,10 +82,9 @@ const {data: departments, loading, error} = useAsync(
 filteredDepartments.map((dept) => (
     <div
     key={dept.id}
-    className='bg-white border border-gray-200 rounded-xl p-5 flex-col gap-3'
-    onClick = {navigate("./departments/:id")}
+    className='bg-white border border-gray-200 rounded-xl p-5 flex-col '
     >
-        <div className='flex items-center justify-between'>
+        <div className='flex items-center justify-between mb-5'>
             <div className='w-10 h-10 rounded-lg bg-[#f0f5f3] flex items-center justify-center text-lg'>
                 {<IconsComp  iconName={dept.Icon} className = 'text-[#639987]'  size = {20}/> || <HiOutlineUsers className='text-[#639987]' size={20}/> }
             </div>
@@ -94,7 +93,7 @@ filteredDepartments.map((dept) => (
             </span>
         </div>
 
-        <div>
+        <div className='mb-5'>
             <h3 className='font-semibold text-lg'>{dept.DeptName}</h3>
             <p className='text-sm text-gray-500 flex items-center gap-1'>
                 <HiOutlineUsers size={14}/> {dept.NoEmployees} Employees
@@ -106,14 +105,25 @@ filteredDepartments.map((dept) => (
             src =  {dept.Employees?.PhotoUrl}
             alt= {dept.Employees?.fullName} />
 
-            <div>
-                <p className='text-xs text-gray-400'>Head of Dept.</p>
+            <div className='w-full flex justify-between'>
+                <div><p className='text-xs text-gray-400'>Head of Dept.</p>
               <p className='text-sm font-medium'>{dept.Employees.fullName ?? "Unassigned"}</p>
+              </div>
+
+                <div className='flex gap-5'>
+           <button className='w-16 h-10 text-[#F9F9F8] bg-[#699378] rounded-lg'
+               onClick = {() => navigate("/departments/deptDetails/:id")}
+           >
+            Details
+            </button>
+           <button className='w-16 h-10 text-[#F9F9F8] bg-red-500 rounded-lg'>
+            Delete
+            </button>
+     </div>
             </div>
         </div>
+   
     </div>
-
-
 ))
         )}
 </div>

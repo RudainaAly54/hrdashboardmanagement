@@ -38,7 +38,7 @@ function App() {
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/employees' element={<Employees />} />
         <Route path='/departments' element={<Departments />} />
-        <Route path = '/departments/:id' element ={<DepartmentDetails/>}/>
+        <Route path = '/departments/deptDetails/:id' element ={<DepartmentDetails/>}/>
         <Route path='/attendance' element={<Attendance />} />
         <Route path='/leave-request' element={<LeaveRequest />} />
         <Route path='/payroll' element={<Payroll />} />
