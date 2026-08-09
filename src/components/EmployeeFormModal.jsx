@@ -68,7 +68,7 @@ const EmployeeFormModal = ( {
         salary: employee?.salary ?? "",
     } : {
         fullName: "",
-        emil: "",
+        email: "",
         gender: "Male",
         deptName: DEPARTMENTS[0].name,
         role: "",

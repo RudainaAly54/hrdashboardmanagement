@@ -1,32 +1,29 @@
-/* Field 
+/* Field
 {
 name : "fullName",
 label: "Full Name"
-type: "text" | "email" | "number" | ....| ... 
+type: "text" | "email" | "number" | ....| ...
 span: 2                    // Optional - makes the field take both grid col
-required: ture        //Optional
+required: true        //Optional
 placeholder: "......"   //Optional
 
 options : [ ..... ]        //Required ("select") => array or [key: value]
 includeEmpty: true //Optional ("select") => adds a blank/unassigned option
-emptyLabel: "unassigned" 
-renderL (values, update) => <jsx/> //required for custom
+emptyLabel: "unassigned"
+render: (values, update) => <jsx/> //required for custom
 }
 */
 
-import { div, fieldset, title } from "framer-motion/m";
 import { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
-import { IoSearch } from "react-icons/io5";
-
 
 const FormModal = ({
-    isOpen, 
-    title, 
-    fields, 
+    isOpen,
+    title,
+    fields,
     initialValues,
-    onSubmit, 
-    onClose, 
+    onSubmit,
+    onClose,
     submitLabel = "Save",
     savingLabel = "Saving ...",
     maxWidth = "max-w-lg"
@@ -37,16 +34,16 @@ const FormModal = ({
 
     //create => empty initial values
     //edit => prefilled initial values
-    useEffect (() => {
-        if(isOpen) {
+    useEffect(() => {
+        if (isOpen) {
             setValues(initialValues || {});
             setError("")
         }
     }, [isOpen, initialValues])
 
-    if(!isOpen) return null;
+    if (!isOpen) return null;
 
-    const update = (name) => e => setValues((prev) => ({...prev, [name]: e.target.value}))
+    const update = (name) => e => setValues((prev) => ({ ...prev, [name]: e.target.value }))
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -56,10 +53,10 @@ const FormModal = ({
             f => f.required && !String(values[f.name] ?? "").trim()
         );
 
-        if(missing.length >0) {
-            setError(`${missing.map(f => f.lable).join(", ")}  ${missing.length > 1 ? "are" : "is"  }`);
-            return 
-        } 
+        if (missing.length > 0) {
+            setError(`${missing.map(f => f.label).join(", ")} ${missing.length > 1 ? "are" : "is"} required.`);
+            return
+        }
 
         setSaving(true)
 
@@ -67,21 +64,19 @@ const FormModal = ({
             await onSubmit(values)
         } catch (err) {
             console.error("Form submit error: ", err)
-            setError(err.message || "Something went wrong please try again");
-        }finally {
+            setError(err.message || "Something went wrong, please try again.");
+        } finally {
             setSaving(false)
         }
     };
 
-
     const handleClose = () => {
-        if(saving) return //don't let the modal close mid save
+        if (saving) return //don't let the modal close mid save
         onClose();
     }
 
-
-    return(
-           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    return (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div className={`bg-white rounded-xl shadow-lg w-full ${maxWidth} max-h-[90vh] overflow-y-auto`}>
                 <div className="flex items-center justify-between p-5 border-b border-gray-100">
                     <h2 className="text-lg font-bold font-[manrope]">{title}</h2>
@@ -89,21 +84,21 @@ const FormModal = ({
                         <FiX size={20} />
                     </button>
                 </div>
- 
+
                 <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4">
                     {error && (
                         <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg p-3">
                             {error}
                         </p>
                     )}
- 
+
                     <div className="grid grid-cols-2 gap-4">
                         {fields.map((field) => (
                             <div key={field.name} className={field.span === 2 ? "col-span-2" : ""}>
                                 {field.type !== "custom" && (
                                     <label className="text-xs text-gray-500 uppercase">{field.label}</label>
                                 )}
- 
+
                                 {field.type === "select" ? (
                                     <select
                                         value={values[field.name] ?? ""}
@@ -135,7 +130,7 @@ const FormModal = ({
                             </div>
                         ))}
                     </div>
- 
+
                     <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
                         <button
                             type="button"
