@@ -1,6 +1,6 @@
 import {useState, useMemo} from 'react'
 import { motion } from 'framer-motion'
-import { useOutletContext } from 'react-router-dom'
+import { useOutletContext, useNavigate, useParams} from 'react-router-dom'
 import {departmentCRUD} from '../api/api'
 import {useAsync} from '../Hooks/useAsync'
 import { FiPlus, FiFilter } from "react-icons/fi";
@@ -11,7 +11,8 @@ import IconsComp from '../components/IconsComp'
 
 const Departments = () => {
 const {search} = useOutletContext() 
-
+const navigate = useNavigate();
+const {id} = useParams()
 const {data: departments, loading, error} = useAsync(
 
     () => 
@@ -82,6 +83,7 @@ filteredDepartments.map((dept) => (
     <div
     key={dept.id}
     className='bg-white border border-gray-200 rounded-xl p-5 flex-col gap-3'
+    onClick = {navigate("./departments/:id")}
     >
         <div className='flex items-center justify-between'>
             <div className='w-10 h-10 rounded-lg bg-[#f0f5f3] flex items-center justify-center text-lg'>

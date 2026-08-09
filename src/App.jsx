@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage'
 import Dashboard from './pages/Dashboard'
 import Employees from './pages/Employees'
 import Departments from './pages/Departments'
+import DepartmentDetails from './pages/DepartmentsDetails'
 import Attendance from './pages/Attendance'
 import LeaveRequest from './pages/LeaveRequest'
 import Payroll from './pages/Payroll'
@@ -37,6 +38,7 @@ function App() {
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/employees' element={<Employees />} />
         <Route path='/departments' element={<Departments />} />
+        <Route path = '/departments/:id' element ={<DepartmentDetails/>}/>
         <Route path='/attendance' element={<Attendance />} />
         <Route path='/leave-request' element={<LeaveRequest />} />
         <Route path='/payroll' element={<Payroll />} />
