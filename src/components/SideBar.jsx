@@ -34,7 +34,7 @@ const SideBar = () => {
             {/* Mobile toggle button — only visible below lg breakpoint */}
             <button
                 onClick={() => setIsMobileOpen(true)}
-                className="lg:hidden fixed top-4 left-4 z-50 bg-[#2C2C2E] p-2 rounded-lg shadow-lg"
+                className="lg:hidden fixed top-4 left-4 z-100 bg-[#2C2C2E] p-2 rounded-lg shadow-lg"
             >
                 <HiMenuAlt2 style={{ color: '#F9F9F8' }} size={24} />
             </button>
@@ -47,7 +47,7 @@ const SideBar = () => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setIsMobileOpen(false)}
-                        className="lg:hidden fixed inset-0 bg-black/50 z-40"
+                        className="lg:hidden fixed inset-0 bg-black/50 z-100"
                     />
                 )}
             </AnimatePresence>

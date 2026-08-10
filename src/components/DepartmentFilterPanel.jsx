@@ -2,7 +2,7 @@ const CATEGORY_OPTIONS = ["Technical", "Business", "Operations", "Revenue", "Cre
 
 const DepartmentFilterPanel = ({ category, onCategoryChange, sortBy, onSortChange, onClose }) => {
     return (
-        <div className="absolute z-40 top-full mt-2 left-0 bg-white border border-gray-200 rounded-xl shadow-lg p-4 w-64 flex flex-col gap-4">
+        <div className="absolute  top-full mt-2 left-0 bg-white border border-gray-200 rounded-xl shadow-lg p-4 w-64 flex flex-col gap-4">
             <div>
                 <label className="text-xs text-gray-500 uppercase">Category</label>
                 <select

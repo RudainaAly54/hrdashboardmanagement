@@ -3,6 +3,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import Dashboard from './pages/Dashboard'
 import Employees from './pages/Employees'
+import EmpDetails from './pages/EmpDetails'
 import Departments from './pages/Departments'
 import DepartmentDetails from './pages/DepartmentsDetails'
 import Attendance from './pages/Attendance'
@@ -37,6 +38,7 @@ function App() {
       >
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/employees' element={<Employees />} />
+        <Route path = '/employees/empDetails/:id' element = {<EmpDetails/>}/>
         <Route path='/departments' element={<Departments />} />
         <Route path = '/departments/deptDetails/:id' element ={<DepartmentDetails/>}/>
         <Route path='/attendance' element={<Attendance />} />

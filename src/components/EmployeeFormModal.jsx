@@ -66,6 +66,7 @@ const EmployeeFormModal = ( {
         city: employee?.city || CITIES[0],
         status: employee?.status || STATUS_OPTIONS[0],
         salary: employee?.salary ?? "",
+        netSalaryPercent: employee?.netSalaryPercent ?? "100",
     } : {
         fullName: "",
         email: "",
@@ -75,9 +76,31 @@ const EmployeeFormModal = ( {
         city: CITIES[0],
         status: "Active", 
         joinDate: new Date().toISOString().slice(0,10),
-        salary: ""
+        salary: "",
+        netSalaryPercent: "100",
     }
 
+
+    const netSalaryFields = [
+        { name: "netSalaryPercent", label: "Net Salary %", type: "number", min: "0", max: "100", step: "0.1", required: true, placeholder: "e.g. 85" },
+        {
+            name: "netSalaryPreview", type: "custom", span: 2,
+            render: (values) => {
+                const gross = parseFloat(values.salary) || 0;
+                const pct = parseFloat(values.netSalaryPercent);
+                const validPct = Number.isNaN(pct) ? 0 : Math.min(100, Math.max(0, pct));
+                const net = gross - ( gross * (validPct / 100));
+                return (
+                    <div className="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
+                        <p className="text-sm text-gray-500">Net Salary (calculated)</p>
+                        <p className="text-sm font-semibold text-[#639987]">
+                            {net.toLocaleString(undefined, { style: "currency", currency: "EGP", maximumFractionDigits: 0 })}
+                        </p>
+                    </div>
+                );
+            },
+        },
+    ];
 
     const fields = isEdit ? [
          { name: "fullName", label: "Full Name", required: true, span: 2 },
@@ -85,6 +108,7 @@ const EmployeeFormModal = ( {
               { name: "city", label: "City", type: "select", options: CITIES },
               { name: "status", label: "Status", type: "select", options: STATUS_OPTIONS },
               { name: "salary", label: "Salary", type: "number", min: "0", step: "0.01", required: true, span: 2 },
+              ...netSalaryFields,
     ] : [
             { name: "fullName", label: "Full Name", required: true, span: 2, placeholder: "e.g. Sara Kamal" },
               { name: "email", label: "Email", type: "email", required: true, span: 2, placeholder: "name@hrelevate.com" },
@@ -100,16 +124,23 @@ const EmployeeFormModal = ( {
               { name: "status", label: "Status", type: "select", options: STATUS_OPTIONS },
               { name: "joinDate", label: "Join Date", type: "date" },
               { name: "salary", label: "Salary", type: "number", min: "0", step: "0.01", required: true, placeholder: "e.g. 25000" },
+              ...netSalaryFields,
     ];
 
     const handleSubmit = async (values) => {
+        const grossSalary = parseFloat(values.salary);
+        const netPercent = Math.min(100, Math.max(0, parseFloat(values.netSalaryPercent) || 0));
+        const netSalary =grossSalary - grossSalary * (netPercent / 100);
+
         if(isEdit) {
             await employeeCRUD.update(employee.id, {
                 fullName: values.fullName.trim(),
                 role: values.role.trim(),
                 city: values.city,
                 status: values.status,
-                salary: parseFloat(values.salary)
+                salary: grossSalary,
+                netSalaryPercent: netPercent,
+                netSalary,
             });
         } else {
             const dept = DEPARTMENTS.find(d => d.name === values.deptName);
@@ -125,7 +156,9 @@ const EmployeeFormModal = ( {
             joinDate: values.joinDate, 
             role: values.role.trim(),
             city: values.city, 
-            salary: parseFloat(values.salary),
+            salary: grossSalary,
+            netSalaryPercent: netPercent,
+            netSalary,
             PhotoUrl: photoUrl
             });
         }
