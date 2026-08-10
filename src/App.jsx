@@ -19,7 +19,7 @@ import TermsPage from './pages/TermsPage' */
 
 function App() {
   return (
-    <main className='bg-[#f9f9f8] max-w-screen'>
+    <main className='bg-[#f9f9f8] max-w-screen h-screen'>
       <Routes>
       {/* Login Route */}
       <Route path='/' element={<LoginPage />} />

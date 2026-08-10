@@ -31,21 +31,10 @@ const LoginPage = ()  => {
 
     return(
     <section
-   className = "w-[100%] p-10 flex  flex-col items-center justify-center gap-5 bg-[url('/loginBG.png')] bg-cover bg-center h-screen"
+  className="relative   w-full    h-dvh   overflow-hidden bg-cover bg-center  bg-no-repeat   flex flex-col items-end justify-center gap-5 px-6 md:px-24 lg:px-48"
+  style={{ backgroundImage: `url(${loginBG})` }}
     >
-        <motion.div
-        initial = {{opacity: 0, x: -100}}
-        whileInView = {{opacity: 1, x: 0}}
-        trasntion = {{duration: 0.8}}
-        className = {className}
-        >
-            <div  className="w-16 h-16 bg-[#639987] rounded-xl flex items-center justify-center shadow-lg shadow-[#2C2C2E] hover:bg-[#A8C3B9] transition-all duration-300 mb-2">
-                <IoMdPeople style=  {{color: '#F9F9F8'}} size = {32}/>
-            </div>
-            <h1 className = "text-5xl font-[manrope]">ElevateHR</h1>
-            <p className = "text-gray-500 text-md font-[inter]">Enterprise People Managememt</p>
-
-        </motion.div>
+     
 
         <motion.form
          initial = {{opacity: 0, x: -100}}
@@ -53,14 +42,18 @@ const LoginPage = ()  => {
         trasntion = {{duration: 0.8}}
         onSubmit={handleSubmit}
         className = {className}
-        className = "bg-[#F9F9F8] w-1/2 md:w-1/4 p-5 rounded-2xl shadow-xl shadow-[#2C2C2E] flex flex-col gap-5 "
+        className = "bg-[#F9F9F8] w-1/3  p-5 rounded-2xl shadow-xl shadow-[#2C2C2E] flex flex-col gap-5  "
         >
 
+            <div className="text-center">
+                <h2 className="text-3xl ">Welcome Back!</h2>
+                <p className="text-sm text-gray-500">Sign in to continue to HR ELEVATE</p>
+            </div>
             <div
             className="flex flex-col gap-2 relative "
             >
-            <label htmlFor="email" className="font-[inter] text-sm">Work Email</label>
-            <CiMail  size={28} className="absolute left-3  top-1/3 translate-y-5  w-4 h-4" style = {{color: 'gray'}}/>
+            <label htmlFor="email" className="text-sm">Work Email</label>
+            <CiMail  size={28} className="absolute left-3  top-1/3 translate-y-5  w-4 h-4 text-gray-700 " />
             <input type="email" name="email" id="email" placeholder= "name@company.com"
            className="w-full pl-10 pr-3 py-2 bg-gray-100 rounded-lg border border-gray-200
                      text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#A8C3B9] cursor-pointer"
@@ -72,9 +65,9 @@ const LoginPage = ()  => {
             className="flex flex-col gap-2 relative "
             >
             <div className="flex justify-between items-center">
-                <label htmlFor="pass" className="font-[inter]">password</label>
+                <label htmlFor="pass" >password</label>
                 <Link to='/forgot-password'
-                className="text-xs font-[inter] text-[#639987] cursor-pointer"
+                className="text-xs  text-[#639987] cursor-pointer"
                 >forgot password? </Link>
             </div>
             <FaLock  size={28} className="absolute left-3  top-1/3 translate-y-5  w-4 h-4" style = {{color: 'gray'}}  />
@@ -102,23 +95,26 @@ const LoginPage = ()  => {
 
           <button
           type="submit"
-          className="w-full h-10  bg-[#639987] rounded-xl text-[#F9F9F8] font-bold text-lg  flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all duration-300"
+          className="w-full h-10  bg-[#639987] rounded-lg text-[#F9F9F8] font-bold text-lg  flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all duration-300"
           >Sign In <FaArrowRight style={{color:"#F9F9F8"}} size={16}/></button>
-        
-        </motion.form>
-
-       <p className = "text-gray-500 text-md font-[inter]">New to ElevateHR? <a href="#"
-                className=" font-[inter] text-[#639987] cursor-pointer"
+        <hr />
+           <div className="flex flex-col gap-2 items-center">
+           <p className = "text-gray-500 text-md ">New to ElevateHR? <a href="#"
+                className="  text-[#639987] cursor-pointer"
                 >Request access </a></p>
 
                 <div className="flex  gap-7">
                     <Link to="/"
-                className="text-sm font-[inter] text-gray-500 cursor-pointer"
+                className="text-sm  text-gray-500 cursor-pointer"
                 >Privcy Polacy </Link>
                     <Link to="/"
-                className="text-sm font-[inter] text-gray-500 cursor-pointer"
+                className="text-sm  text-gray-500 cursor-pointer"
                 >Terms & Conditions</Link>
                 </div>
+    </div>
+        </motion.form>
+
+ 
     </section>
     )
 }
