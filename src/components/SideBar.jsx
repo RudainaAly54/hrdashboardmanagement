@@ -10,10 +10,18 @@ import { FaRegCalendarTimes, FaRegCalendarCheck } from "react-icons/fa";
 import { FaMoneyBills } from "react-icons/fa6";
 import { CiSettings } from "react-icons/ci";
 import { HiMenuAlt2, HiX } from "react-icons/hi";
+import { useAuth } from '../context/AuthContext';
 
 const SideBar = () => {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+    const { user, hrProfile } = useAuth();
+
+    // hrProfile comes from your "HRemp" table (fullName/role/PhotoUrl columns).
+    // user is the raw Supabase auth user, kept only as an email fallback.
+    const hrName = hrProfile?.fullName || user?.email || "User";
+    const hrRole = hrProfile?.role || "Enterprise Admin";
+    const avatarUrl = hrProfile?.PhotoUrl;
 
     const pagesNav = [
         { name: 'Dashboard', path: '/dashboard', icon: <MdDashboard style={{ color: '#F9F9F8' }} size={18} /> },
@@ -39,7 +47,7 @@ const SideBar = () => {
                 <HiMenuAlt2 style={{ color: '#F9F9F8' }} size={24} />
             </button>
 
-        
+
             <AnimatePresence>
                 {isMobileOpen && (
                     <motion.div
@@ -52,18 +60,18 @@ const SideBar = () => {
                 )}
             </AnimatePresence>
 
-          <motion.aside
-    onMouseEnter={() => setIsHovered(true)}
-    onMouseLeave={() => setIsHovered(false)}
-    animate={{ width: isHovered ? 256 : 80 }}
-    transition={{ duration: 0.3, ease: "easeInOut" }}
-    className={`
+            <motion.aside
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                animate={{ width: isHovered ? 256 : 80 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className={`
         bg-[#2C2C2E] fixed  h-screen top-0 left-0 p-5 flex flex-col gap-5 shadow-lg shadow-[#2C2C2E]
         w-64 transition-transform duration-300 
                ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:!w-auto
     `}
->
+            >
                 {/* Mobile close button */}
                 <button
                     onClick={() => setIsMobileOpen(false)}
@@ -123,6 +131,36 @@ const SideBar = () => {
                         </NavLink>
                     ))}
                 </nav>
+
+                {/* Logged-in user — pinned to the bottom of the sidebar */}
+                <div className="mt-auto pt-4 border-t border-white/10 flex items-center gap-3 overflow-hidden">
+                    {avatarUrl ? (
+                        <img
+                            src={avatarUrl}
+                            alt={hrName}
+                            className="w-9 h-9 rounded-full object-cover flex-shrink-0 border-2 border-[#639987]"
+                        />
+                    ) : (
+                        <div className="w-9 h-9 rounded-full bg-[#639987] flex items-center justify-center text-[#F9F9F8] text-sm font-semibold flex-shrink-0">
+                            {hrName.charAt(0).toUpperCase()}
+                        </div>
+                    )}
+
+                    <AnimatePresence>
+                        {isExpanded && (
+                            <motion.div
+                                initial={{ opacity: 0, width: 0 }}
+                                animate={{ opacity: 1, width: "auto" }}
+                                exit={{ opacity: 0, width: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="overflow-hidden whitespace-nowrap"
+                            >
+                                <p className="text-[#F9F9F8] text-sm font-medium truncate">{hrName}</p>
+                                <p className="text-gray-500 text-xs truncate">{hrRole}</p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
             </motion.aside>
         </>
     );

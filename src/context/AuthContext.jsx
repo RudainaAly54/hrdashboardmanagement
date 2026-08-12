@@ -37,7 +37,9 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) return { error };
+        if (error) {
+            return { error: { message: "Incorrect email or password. Please check your details and try again." } };
+        }
 
         const { data: hrRow, error: hrError } = await supabase
             .from('HRemp')
@@ -45,11 +47,16 @@ export const AuthProvider = ({ children }) => {
             .eq('auth_user_id', data.user.id)
             .single();
 
-        if (hrError) return { error: hrError };
+        // .single() returns an error (PGRST116) rather than hrRow: null when no
+        // matching row exists — that's the "valid login, not an HR account" case,
+        // not an unexpected failure, so it gets the friendly unauthorized message too.
+        const isNoRowFound = hrError?.code === 'PGRST116';
 
-        if (!hrRow) {
+        if (hrError && !isNoRowFound) return { error: hrError };
+
+        if (!hrRow || isNoRowFound) {
             await supabase.auth.signOut();
-            return { error: { message: "This account is not authorized for HR access." } };
+            return { error: { message: "This account isn't authorized for HR access. Contact your system administrator if you believe this is a mistake." } };
         }
 
         return { error: null }; 
