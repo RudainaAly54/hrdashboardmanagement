@@ -143,8 +143,7 @@ const Employees = () => {
 
     const totalPage = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
-    // Export CSV — getAll() doesn't support search, so the search term is
-    // applied client-side after fetching everything matching the filters.
+
     const handleExportCSV = async () => {
         setExporting(true);
         try {

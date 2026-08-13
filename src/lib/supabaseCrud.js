@@ -1,4 +1,3 @@
-import { filter } from 'framer-motion/m';
 import {createClient} from './supabaseClient';
 
 const supabase = createClient(); 
