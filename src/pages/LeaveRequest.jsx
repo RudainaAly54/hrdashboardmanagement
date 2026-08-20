@@ -1,4 +1,4 @@
-import SideBar from "../components/SideBar"
+import { useEffect, useState } from "react"
 const LeaveRequest = () => {
     return(
        <></>

@@ -8,7 +8,7 @@ const Header = ({ search, onSearchChange, placeholder = "Search employees, ID, o
 
   return (
     <header className="flex items-center justify-evenly gap-3 px-6 py-4 border-b md:w-full">
-      <h2 className="hidden md:block text-2xl font-[inter] font-bold">{headerTitle}</h2>
+      <h2 className="hidden md:block text-2xl  font-bold">{headerTitle}</h2>
       <div className="relative w-full max-w-md">
         <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
         <input
