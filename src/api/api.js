@@ -4,4 +4,4 @@ const departmentCRUD = createCrud("Departments")
 const attendanceCRUD = createCrud("Attendance")
 const leaveRequestCRUD = createCrud("LeaveRequests")
 
-export {employeeCRUD, departmentCRUD, attendanceCRUD}
+export {employeeCRUD, departmentCRUD, attendanceCRUD, leaveRequestCRUD}
