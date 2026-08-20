@@ -1,5 +1,6 @@
 /* Components */
 import Pagination from "../components/Pagination";
+import SkeletonLoader from "../components/SkeletonLoader";
 
 /* Libraries */
 import { motion } from "framer-motion";
@@ -481,9 +482,7 @@ const Payroll = () => {
                     </thead>
                     <tbody className={loading ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
                         {loading && rows.length === 0 ? (
-                            <tr>
-                                <td colSpan={5} className="p-8 text-center text-gray-400">Loading payroll records...</td>
-                            </tr>
+                           <SkeletonLoader variant="table" rows={PAGE_SIZE} columns={5} />
                         ) : rows.length === 0 && !loading ? (
                             <tr>
                                 <td colSpan={5} className="p-8 text-center text-gray-400">No records found</td>

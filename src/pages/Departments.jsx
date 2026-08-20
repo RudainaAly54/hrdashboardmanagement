@@ -11,13 +11,14 @@ import IconsComp from '../components/IconsComp'
 import DepartmentModal from '../components/DepartmentModal'
 import DepartmentFilterPanel from '../components/DepartmentFilterPanel'
 import ConfirmDialog from '../components/CofirmDialog'
+import SkeletonLoader from '../components/SkeletonLoader'
 
 const Departments = () => {
     const { search } = useOutletContext()
     const navigate = useNavigate();
     const { showToast } = useToast();
 
-    const { data: departments, loading, error, refetch } = useAsync(
+    const { data: departments, setData,loading, error, refetch } = useAsync(
         () =>
             departmentCRUD.getAll({
                 orderBy: "DeptName",
@@ -68,6 +69,7 @@ const Departments = () => {
         setRemovingDept(true);
         try {
             await departmentCRUD.remove(deletingDept.id);
+            setData(prev => prev.filter(d => d.id !== deletingDept))
             showToast("Department deleted.", "success");
             refetch();
         } catch (err) {
@@ -137,7 +139,7 @@ const Departments = () => {
 
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                 {loading ? (
-                    <p className='text-gray-400 col-span-full text-center py-8'>Loading Departments ...</p>
+                      <SkeletonLoader variant="cards" count={6} />
                 ) : filteredDepartments.length === 0 ? (
                     <p className='text-gray-400 col-span-full text-center py-8'>No departments found.</p>
                 ) : (

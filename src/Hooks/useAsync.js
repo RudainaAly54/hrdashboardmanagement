@@ -25,5 +25,5 @@ export const useAsync = (asyncFn, dependencies = []) => {
         execute()
     }, [execute])
 
-    return {data, loading, error, refetch: execute}
+return {data, setData, loading, error, refetch: execute}
 }

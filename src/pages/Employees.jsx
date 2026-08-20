@@ -5,6 +5,7 @@ import QuickFilters from "../components/QuickFilters";
 import MoreFiltersPanel from "../components/MoreFiltersPanel";
 import EmployeeFormModal from '../components/EmployeeFormModal';
 import ConfirmDialog from '../components/CofirmDialog'
+import SkeletonLoader from "../components/SkeletonLoader";
 
 /* Libraries */
 import { motion } from "framer-motion"
@@ -319,7 +320,7 @@ const Employees = () => {
                         <tbody className={loading ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
                             {loading && employees.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="p-8 text-center text-gray-400">Loading Employees...</td>
+                                    <SkeletonLoader variant="table" rows={PAGE_SIZE} columns={6} />
                                 </tr>
                             ) : employees.length === 0 && !loading ? (
                                 <tr>

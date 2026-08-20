@@ -9,7 +9,7 @@ import {downloadCSV} from '../lib/downloadCSV'
 import realtiveTime from  '../lib/relativeTime'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { FiDownload, FiPlus, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
-import { button, div, span } from "framer-motion/m"
+import SkeletonLoader from "../components/SkeletonLoader"
 
 const QUICK_FILTERS = ["All", "Sick leave", "Vecation", "Remote"]
 
@@ -47,7 +47,7 @@ const LeaveRequest = () => {
     const {hrProfile} = useAuth();
     const {showToast} = useToast()
 
-    const {data: requests, loading, error, refetch} = useAsync(
+    const {data: requests, setData, loading, error, refetch} = useAsync(
         () => 
             leaveRequestCRUD.getAll({
                 orderBy: "createdAt",
@@ -75,7 +75,7 @@ const LeaveRequest = () => {
 
     const pendingCount = all.filter(r => r.status ==="Pending").length
     const pendingToday = all.filter(r =>  r.status === "Pending" && isToday(r.createdAt)).length
-    const approvedThisMonth = all.filter(r => r.status === "Approved" && isSameMonth(r.createdAt))
+    const approvedThisMonth = all.filter(r => r.status === "Approved" && isSameMonth(r.createdAt)).length
 
     const recentActions = useMemo(() => {
         return all 
@@ -87,12 +87,12 @@ const LeaveRequest = () => {
     const handleDecision = async (request, decision) =>{
         setActingId(request.id)
         try {
-            await leaveRequestCRUD.update(request.id, {
+           const update =  await leaveRequestCRUD.update(request.id, {
                 status: decision,
                 reviewedAt: new Date().toISOString(),
                 reviewedBy: hrProfile?.fullName || "HR"
             })
-            await refetch();
+            setData(prev => prev.map(r => r.id === request.id ? {...r, ...update}: r))
             showToast(`Request ${decision.toLowerCase()}.`, decision === "Approved" ? "success" : "info")
         } catch(err) {
             console.error("Error updating leave request", err)
@@ -161,7 +161,10 @@ const LeaveRequest = () => {
         </div>
 
         {loading ? (
-            <LoadingSpinner/> 
+         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <div className="lg:col-span-2"><SkeletonLoader variant="cards" count={3} /></div>
+    <div className="flex flex-col gap-3"><SkeletonLoader variant="list" rows={5} /></div>
+</div>
         ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
               <div className="lg:col-span-2 flex flex-col gap-5">

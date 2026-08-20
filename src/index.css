@@ -12,3 +12,13 @@
 border: 2px solid rgba(0,0,0, 0.2);
 border-radius: 5px;
 }
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #eef1f0 25%, #cfe0d8 37%, #eef1f0 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}

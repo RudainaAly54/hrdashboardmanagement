@@ -2,6 +2,7 @@
 import Pagination from "../components/Pagination"
 import AttendanceFormModal from "../components/AttendanceFormModal"
 import ConfirmDialog from "../components/CofirmDialog"
+import SkeletonLoader from "../components/SkeletonLoader"
 
 
 //Libraries
@@ -423,9 +424,7 @@ const Attendance = () => {
  
                         <tbody className={loading ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
                             {loading && rows.length === 0 ? (
-                                <tr>
-                                    <td colSpan={7} className="p-8 text-center text-gray-400">Loading attendance...</td>
-                                </tr>
+                              <SkeletonLoader variant="table" rows={PAGE_SIZE} columns={7} />
                             ) : rows.length === 0 && !loading ? (
                                 <tr>
                                     <td colSpan={7} className="p-8 text-center text-gray-400">No records found for this day</td>
