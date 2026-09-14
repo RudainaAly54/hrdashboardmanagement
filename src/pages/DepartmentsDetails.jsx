@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { departmentCRUD, employeeCRUD } from "../api/api";
+import { useGetDepartmentByIdQuery, useDeleteDepartmentMutation } from "../store/departmentsApi";
+import { useGetEmployeesQuery, useDeleteEmployeeMutation } from "../store/employeesApi";
 import { useToast } from "../context/ToastContext";
 import StatusBadge from "../components/StatusBadge";
 import IconsComp from "../components/IconsComp";
@@ -15,10 +16,28 @@ const DepartmentsDetails = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
 
-    const [department, setDepartment] = useState(null);
-    const [employees, setEmployees] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [message, setMessage] = useState("");
+    const {
+        data: department,
+        isLoading: deptLoading,
+        error: deptError,
+    } = useGetDepartmentByIdQuery(id);
+
+    // Employees are linked to a department by matching `deptName` text —
+    // that's what the Add Employee form actually writes, so it's the
+    // reliable join key here even though a DeptId FK column also exists.
+    const {
+        data: employees = [],
+        isLoading: empLoading,
+    } = useGetEmployeesQuery(
+        { filters: { deptName: department?.DeptName }, orderBy: "fullName" },
+        { skip: !department?.DeptName }
+    );
+
+    const loading = deptLoading || (!!department && empLoading);
+    const message = deptError?.message ?? "";
+
+    const [removeDepartment] = useDeleteDepartmentMutation();
+    const [removeEmployee] = useDeleteEmployeeMutation();
 
     const [isEditDeptOpen, setIsEditDeptOpen] = useState(false);
     const [isDeleteDeptOpen, setIsDeleteDeptOpen] = useState(false);
@@ -28,46 +47,18 @@ const DepartmentsDetails = () => {
     const [deletingEmployee, setDeletingEmployee] = useState(null);
     const [removingEmployee, setRemovingEmployee] = useState(false);
 
-    // Employees are linked to a department by matching `deptName` text —
-    // that's what the Add Employee form actually writes, so it's the
-    // reliable join key here even though a DeptId FK column also exists.
-    const loadData = useCallback(async () => {
-        setLoading(true);
-        setMessage("");
-        try {
-            const dept = await departmentCRUD.getById(id);
-            setDepartment(dept);
-
-            const staff = await employeeCRUD.getAll({
-                filters: { deptName: dept.DeptName },
-                orderBy: "fullName",
-            });
-            setEmployees(staff);
-        } catch (err) {
-            console.error("Error loading department:", err);
-            setMessage(err.message || "Could not load this department.");
-        } finally {
-            setLoading(false);
-        }
-    }, [id]);
-
-    useEffect(() => {
-        loadData();
-    }, [loadData]);
-
     const totalSalary = employees.reduce((sum, emp) => sum + (Number(emp.salary) || 0), 0);
     const activeCount = employees.filter((e) => e.status === "Active").length;
 
     const handleDeptUpdated = () => {
         setIsEditDeptOpen(false);
-        loadData();
         showToast("Department updated successfully!", "success");
     };
 
     const handleDeleteDept = async () => {
         setDeletingDept(true);
         try {
-            await departmentCRUD.remove(id);
+            await removeDepartment(id).unwrap();
             showToast("Department deleted.", "success");
             navigate("/departments");
         } catch (err) {
@@ -81,16 +72,14 @@ const DepartmentsDetails = () => {
 
     const handleEmployeeUpdated = () => {
         setEditingEmployee(null);
-        loadData();
         showToast("Employee updated successfully!", "success");
     };
 
     const handleDeleteEmployee = async () => {
         setRemovingEmployee(true);
         try {
-            await employeeCRUD.remove(deletingEmployee.id);
+            await removeEmployee(deletingEmployee.id).unwrap();
             showToast("Employee removed.", "success");
-            loadData();
         } catch (err) {
             console.error("Error removing employee:", err);
             showToast(err.message || "Could not remove this employee.", "error");

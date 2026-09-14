@@ -1,11 +1,10 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { useOutletContext, useNavigate } from 'react-router-dom'
-import { departmentCRUD } from '../api/api'
-import { useAsync } from '../Hooks/useAsync'
+import { useGetDepartmentsQuery, useDeleteDepartmentMutation } from '../store/departmentsApi'
 import { useToast } from '../context/ToastContext'
 import { FiPlus, FiFilter } from "react-icons/fi";
-import { FaRegEye } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa";
 import IconsComp from '../components/IconsComp'
 import DepartmentModal from '../components/DepartmentModal'
@@ -18,12 +17,12 @@ const Departments = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
 
-    const { data: departments, setData,loading, error, refetch } = useAsync(
-        () =>
-            departmentCRUD.getAll({
-                orderBy: "DeptName",
-                selectQuery: "*, Employees:headID(fullName, PhotoUrl)",
-            }), [])
+    const { data: departments, isLoading: loading, error } = useGetDepartmentsQuery({
+        orderBy: "DeptName",
+        selectQuery: "*, Employees:headID(fullName, PhotoUrl)",
+    });
+
+    const [removeDepartment] = useDeleteDepartmentMutation();
 
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [editingDept, setEditingDept] = useState(null);
@@ -61,17 +60,14 @@ const Departments = () => {
 
     const handleCreated = () => {
         setIsCreateOpen(false);
-        refetch();
         showToast("Department created successfully!", "success");
     };
 
     const handleDeleteDept = async () => {
         setRemovingDept(true);
         try {
-            await departmentCRUD.remove(deletingDept.id);
-            setData(prev => prev.filter(d => d.id !== deletingDept))
+            await removeDepartment(deletingDept.id).unwrap();
             showToast("Department deleted.", "success");
-            refetch();
         } catch (err) {
             console.error("Error deleting department:", err);
             showToast(err.message || "Could not delete this department.", "error");
@@ -134,7 +130,7 @@ const Departments = () => {
             </div>
 
             {error && (
-                <p className="p-4 text-sm text-red-600 bg-red-50 rounded-lg">{error}</p>
+                <p className="p-4 text-sm text-red-600 bg-red-50 rounded-lg">{error.message || String(error)}</p>
             )}
 
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
@@ -168,11 +164,17 @@ const Departments = () => {
                             </button>
 
                             <div className='flex items-center gap-2 pt-3 border-t'>
-                                <img
-                                    className='w-10 h-10 rounded-full object-cover'
-                                    src={dept.Employees?.PhotoUrl}
-                                    alt={dept.Employees?.fullName ?? "No head assigned"}
-                                />
+                                {dept.Employees?.PhotoUrl ? (
+     <img
+         className='w-10 h-10 rounded-full object-cover'
+         src={dept.Employees.PhotoUrl}
+         alt={dept.Employees.fullName}
+     />
+ ) : (
+     <div className='w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0'>
+         <FaUsers className='text-gray-300' size={16} />
+     </div>
+ )}
 
                                 <div className='w-full flex justify-between items-center'>
                                     <div>
@@ -181,12 +183,7 @@ const Departments = () => {
                                     </div>
 
                                     <div className='flex gap-2'>
-                                        <button
-                                            onClick={() => navigate(`/departments/deptDetails/${dept.id}`)}
-                                            
-                                        >
-                                           <FaRegEye className='text-gray-500 hover:text-gray-700 transition-all duration-100' size= {24}/>
-                                        </button>
+                                       
                                         <button
                                             onClick={() => setDeletingDept(dept)}
                                         >

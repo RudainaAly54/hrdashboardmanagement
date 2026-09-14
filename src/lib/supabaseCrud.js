@@ -58,10 +58,10 @@ getPage : async({
 },
 
 
-    getById : async (id, idColumn = "id") => {
+    getById : async (id, idColumn = "id", selectQuery = "*") => {
         const {data, error}  = await supabase
         .from(tableName)
-        .select("*")
+        .select(selectQuery)
         .eq(idColumn, id)
         .single();
 

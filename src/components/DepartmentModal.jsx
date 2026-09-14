@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { departmentCRUD } from "../api/api"
+import { useCreateDepartmentMutation, useUpdateDepartmentMutation } from "../store/departmentsApi"
 import { createClient } from "../lib/supabaseClient"
 import IconsComp from "./IconsComp"
 import FormModal from "./FormModal";
@@ -19,6 +19,9 @@ const DepartmentModal = ({
 }) => {
 
     const isEdit = mode === "edit";
+
+    const [createDepartment] = useCreateDepartmentMutation();
+    const [updateDepartment] = useUpdateDepartmentMutation();
 
     const [employees, setEmployees] = useState([]);
 
@@ -92,9 +95,9 @@ const DepartmentModal = ({
         };
 
         if (isEdit) {
-            await departmentCRUD.update(initialData.id, payload);
+            await updateDepartment({ id: initialData.id, payload }).unwrap();
         } else {
-            await departmentCRUD.create({ ...payload, NoEmployees: 0 });
+            await createDepartment({ ...payload, NoEmployees: 0 }).unwrap();
         }
         onSuccess();
     }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { employeeCRUD} from "../api/api";
+import { useGetEmployeeByIdQuery, useDeleteEmployeeMutation } from '../store/employeesApi'
 import { useToast } from "../context/ToastContext";
 import StatusBadge from "../components/StatusBadge";
 import EmployeeFormModal from "../components/EmployeeFormModal";
@@ -13,46 +13,25 @@ const EmpDetails = () => {
     const navigate = useNavigate();
     const {showToast} = useToast();
 
-    const [employee, setEmployee] = useState(null);
-    const [loading, setLoading] = useState(true)
-    const [message, setMessage]  = useState("")
-
-
 const [isEditOpen, setIsEditOpen]  = useState(false)
 const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 const [deleting, setDeleting] = useState(false);
 
-const loadData = useCallback(async () => {
-    setLoading(true)
-    setMessage("")
-
-    try {
-        const emp = await employeeCRUD.getById(id);
-        setEmployee(emp)
-    } catch (err) {
-        console.error("Error Loading Employee", err)
-        setMessage(err.message || "Could not load this employee")
-    } finally {
-        setLoading(false)
-    }
-}, [id])
-
-
-useEffect( () => {
-loadData()
-}, [loadData])
+const { data: employee, isLoading: loading, error, refetch } = useGetEmployeeByIdQuery(id);
+  const message = error;
+ const [removeEmployee] = useDeleteEmployeeMutation();
 
 
 const handleUpdate = () => {
     setIsEditOpen(false);
-    loadData();
+   refetch();
     showToast("Employee updated successfully", "success")
 }
 
 const handleDelete = async () => {
     setDeleting(true)
     try {
-        await employeeCRUD.remove(id);
+        await removeEmployee(id).unwrap();
         showToast("Employee removed", "success")
         navigate("/employees")
     } catch (err) {

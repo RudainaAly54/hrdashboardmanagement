@@ -11,30 +11,28 @@ import SkeletonLoader from "../components/SkeletonLoader";
 import { motion } from "framer-motion"
 
 /* Hooks & Context */
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { createClient } from "../lib/supabaseClient"
 import { useOutletContext, Link } from "react-router-dom"
 import { downloadCSV } from '../lib/downloadCSV'
 import { useToast } from "../context/ToastContext";
 import { employeeCRUD } from "../api/api";
+import { useGetEmployeesPageQuery, useDeleteEmployeeMutation, useBulkDeleteEmployeesMutation } from "../store/employeesApi";
 
 /* Icons */
 import { FiDownload, FiPlus, FiEdit2, FiTrash2 } from "react-icons/fi";
-import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaUsers } from "react-icons/fa";
 import { FaUmbrellaBeach } from "react-icons/fa6";
 import { HiOutlineSparkles } from "react-icons/hi2";
 
-// employeeCRUD.count() only supports exact-match (.eq) filters, so the
-// "New Hires this month" count (a >= date range) still needs a direct
-// Supabase call — everything else below goes through the shared CRUD.
+// employeeCRUD.count() only supports exact-match (.eq) filters, and export
+// pulls the full unpaginated dataset — neither is cacheable list state, so
+// both still go straight through supabase / the shared CRUD, not RTK Query.
 const supabase = createClient();
 const TABLE_NAME = 'Employees';
 const PAGE_SIZE = 5;
 
 const Employees = () => {
-    const [employees, setEmployees] = useState([]);
-    const [totalCount, setTotalCount] = useState(0);
     const [activeCount, setActiveCount] = useState(0);
     const [onLeaveCount, setOnLeaveCount] = useState(0);
     const [newHiresCount, setNewHiresCount] = useState(0);
@@ -44,8 +42,7 @@ const Employees = () => {
     const [selectedIds, setSelectedIds] = useState(new Set());
 
     const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState(true);
-    const [message, setMessage] = useState("");
+    const [exportErrorMessage, setExportErrorMessage] = useState('');
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [exporting, setExporting] = useState(false);
@@ -58,6 +55,9 @@ const Employees = () => {
     const [deletingEmployee, setDeletingEmployee] = useState(null);
     const [deleting, setDeleting] = useState(false);
 
+    const [isBulkConfirmOpen, setIsBulkConfirmOpen] = useState(false);
+    const [bulkDeleting, setBulkDeleting] = useState(false);
+
     const toggleRow = (id) => {
         setSelectedIds(prev => {
             const next = new Set(prev);
@@ -68,56 +68,36 @@ const Employees = () => {
     };
 
     const { search } = useOutletContext(); // shared search term, owned by Layout
-    const cacheRef = useRef(new Map());
     const { showToast } = useToast();
 
-    // 1. reset to page 1 whenever the search term or filters change, so a
+    // reset to page 1 whenever the search term or filters change, so a
     // narrowed result set never leaves the user on a page that no longer exists.
     useEffect(() => {
         setPage(1);
     }, [search, filters]);
 
-    // 2. main paginated fetch, via the shared CRUD's getPage()
-    useEffect(() => {
-        const fetchEmployees = async () => {
-            const cacheKey = JSON.stringify({ page, search, filters });
+    // main paginated fetch — cached & auto-refetched by RTK Query
+    const { data: pageResult, isFetching: loading, error: queryError } = useGetEmployeesPageQuery({
+        page,
+        pageSize: PAGE_SIZE,
+        orderBy: "fullName",
+        searchColumn: "fullName",
+        searchTerm: search,
+        filters,
+    });
 
-            if (cacheRef.current.has(cacheKey)) {
-                const cached = cacheRef.current.get(cacheKey);
-                setEmployees(cached.data);
-                setTotalCount(cached.count);
-                setMessage("");
-                return;
-            }
+    const employees = pageResult?.data ?? [];
+    const totalCount = pageResult?.count ?? 0;
+    const message = queryError?.message ?? "";
 
-            setLoading(true);
-            setMessage("");
+    const [removeEmployee] = useDeleteEmployeeMutation();
+    const [bulkDeleteEmployees] = useBulkDeleteEmployeesMutation();
 
-            try {
-                const { data, count } = await employeeCRUD.getPage({
-                    page,
-                    pageSize: PAGE_SIZE,
-                    orderBy: "fullName",
-                    searchColumn: "fullName",
-                    searchTerm: search,
-                    filters,
-                });
+    // Selection only tracks ids currently visible on this page — the names
+    // shown in the bulk confirm dialog come from the loaded `employees` list.
+    const selectedEmployees = employees.filter((emp) => selectedIds.has(emp.id));
 
-                setEmployees(data);
-                setTotalCount(count);
-                cacheRef.current.set(cacheKey, { data, count });
-            } catch (err) {
-                console.error("Error fetching employees:", err);
-                setMessage(err.message || "An error occurred while fetching employees data");
-                setEmployees([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchEmployees();
-    }, [page, search, filters]);
-
-    // 3. summary card counts — reflects the WHOLE table, not just the current page
+    // summary card counts — reflects the WHOLE table, not just the current page
     useEffect(() => {
         const fetchSummaryCounts = async () => {
             try {
@@ -144,9 +124,9 @@ const Employees = () => {
 
     const totalPage = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
-
     const handleExportCSV = async () => {
         setExporting(true);
+        setExportErrorMessage('');
         try {
             let data = await employeeCRUD.getAll({ orderBy: "fullName", filters });
 
@@ -157,7 +137,7 @@ const Employees = () => {
             }
 
             if (!data || data.length === 0) {
-                setMessage("No employees to export");
+                setExportErrorMessage("No employees to export");
                 showToast("No employees to export", "error");
                 return;
             }
@@ -167,7 +147,7 @@ const Employees = () => {
             showToast(`Exported ${data.length} employees to CSV`, "success");
         } catch (err) {
             console.error("Error Exporting Employees", err);
-            setMessage(err.message || "Something went wrong while exporting");
+            setExportErrorMessage(err.message || "Something went wrong while exporting");
             showToast("Export failed — please try again", "error");
         } finally {
             setExporting(false);
@@ -176,7 +156,6 @@ const Employees = () => {
 
     const handleEmployeeAdded = () => {
         setIsAddModalOpen(false);
-        cacheRef.current.clear();
         setPage(1);
         setRefreshKey((k) => k + 1);
         showToast("Employee added successfully!", "success");
@@ -190,7 +169,6 @@ const Employees = () => {
     const handleEmployeeUpdated = () => {
         setEditingEmployee(null);
         setIsEditingModalOpen(false);
-        cacheRef.current.clear();
         setRefreshKey((k) => k + 1);
         showToast("Employee updated successfully!", "success");
     };
@@ -198,13 +176,13 @@ const Employees = () => {
     const handleDeleteConfirmed = async () => {
         setDeleting(true);
         try {
-            await employeeCRUD.remove(deletingEmployee.id);
-
-            setEmployees((prev) => prev.filter((emp) => emp.id !== deletingEmployee.id));
-            setTotalCount((prev) => Math.max(0, prev - 1));
-            cacheRef.current.clear();
+            await removeEmployee(deletingEmployee.id).unwrap();
+            setSelectedIds((prev) => {
+                const next = new Set(prev);
+                next.delete(deletingEmployee.id);
+                return next;
+            });
             setRefreshKey((k) => k + 1);
-
             showToast("Employee deleted successfully", "success");
         } catch (err) {
             console.error("Error deleting employee:", err);
@@ -212,6 +190,23 @@ const Employees = () => {
         } finally {
             setDeleting(false);
             setDeletingEmployee(null);
+        }
+    };
+
+    const handleBulkDeleteConfirmed = async () => {
+        setBulkDeleting(true);
+        try {
+            const ids = [...selectedIds];
+            await bulkDeleteEmployees(ids).unwrap();
+            setSelectedIds(new Set());
+            setRefreshKey((k) => k + 1);
+            showToast(`${ids.length} employee${ids.length > 1 ? "s" : ""} deleted successfully`, "success");
+        } catch (err) {
+            console.error("Error bulk deleting employees:", err);
+            showToast(err.message || "Couldn't delete selected employees", "error");
+        } finally {
+            setBulkDeleting(false);
+            setIsBulkConfirmOpen(false);
         }
     };
 
@@ -299,15 +294,43 @@ const Employees = () => {
 
                 {/* Employee Table */}
                 <div className="bg-[#F9F9F8] border border-gray-200 rounded-xl overflow-hidden">
-                    {message && (
-                        <p className="p-4 text-sm text-red-600 bg-red-50 border-b border-red-100">{message}</p>
+                    {(message || exportErrorMessage) && (
+                        <p className="p-4 text-sm text-red-600 bg-red-50 border-b border-red-100">
+                            {message || exportErrorMessage}
+                        </p>
+                    )}
+
+                    {/* Bulk delete bar — only visible while at least one row is checked */}
+                    {selectedIds.size > 0 && (
+                        <div className="flex items-center justify-between px-4 py-3 border-b bg-[rgba(168,195,185,0.1)]">
+                            <p className="text-sm text-gray-600">
+                                {selectedIds.size} employee{selectedIds.size > 1 ? "s" : ""} selected
+                            </p>
+                            <button
+                                onClick={() => setIsBulkConfirmOpen(true)}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+                            >
+                                <FiTrash2 size={14} /> Delete Selected
+                            </button>
+                        </div>
                     )}
 
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="text-left text-gray-500 text-xs uppercase border-b">
                                 <th className="p-4 font-medium flex gap-10">
-                                    <input type="checkbox" className="h-5 w-5 accent-[#A8C3B9]" /> Employee Name
+                                    <input
+                                        type="checkbox"
+                                        className="h-5 w-5 accent-[#A8C3B9]"
+                                        checked={employees.length > 0 && selectedIds.size === employees.length}
+                                        onChange={() => {
+                                            setSelectedIds((prev) => {
+                                                const allChecked = employees.length > 0 && prev.size === employees.length;
+                                                if (allChecked) return new Set();
+                                                return new Set(employees.map((emp) => emp.id));
+                                            });
+                                        }}
+                                    /> Employee Name
                                 </th>
                                 <th className="p-4 font-medium">Department</th>
                                 <th className="p-4 font-medium">Join Date</th>
@@ -363,20 +386,14 @@ const Employees = () => {
                                                 <StatusBadge status={emp.status} />
                                             </td>
                                             <td className="p-4">
-                                                {isChecked ? (
-                                                    <div className="flex gap-2 items-center">
-                                                        <button onClick={() => handleEditClick(emp)} className="cursor-pointer">
-                                                            <FiEdit2 className="text-gray-500" size={16} />
-                                                        </button>
-                                                        <button onClick={() => setDeletingEmployee(emp)} className="cursor-pointer">
-                                                            <FiTrash2 className="text-gray-500" size={16} />
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-gray-400 hover:text-gray-700 cursor-none">
-                                                        <BsThreeDotsVertical />
-                                                    </div>
-                                                )}
+                                                <div className="flex gap-2 items-center">
+                                                    <button onClick={() => handleEditClick(emp)} className="cursor-pointer">
+                                                        <FiEdit2 className="text-gray-500 hover:text-[#639987]" size={16} />
+                                                    </button>
+                                                    <button onClick={() => setDeletingEmployee(emp)} className="cursor-pointer">
+                                                        <FiTrash2 className="text-gray-500 hover:text-red-600" size={16} />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     );
@@ -420,6 +437,20 @@ const Employees = () => {
                 onConfirm={handleDeleteConfirmed}
                 onCancel={() => setDeletingEmployee(null)}
                 loading={deleting}
+            />
+
+            <ConfirmDialog
+                isOpen={isBulkConfirmOpen}
+                title={`Delete ${selectedEmployees.length} employee${selectedEmployees.length > 1 ? "s" : ""}?`}
+                message={
+                    selectedEmployees.length > 0
+                        ? `${selectedEmployees.map((emp) => emp.fullName).join(", ")} will be permanently removed from the system.`
+                        : ""
+                }
+                confirmLabel="Delete All"
+                onConfirm={handleBulkDeleteConfirmed}
+                onCancel={() => setIsBulkConfirmOpen(false)}
+                loading={bulkDeleting}
             />
         </>
     );

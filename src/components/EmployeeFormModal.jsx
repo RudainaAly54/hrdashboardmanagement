@@ -1,4 +1,4 @@
-import { employeeCRUD } from "../api/api";
+import { useCreateEmployeeMutation, useUpdateEmployeeMutation } from "../store/employeesApi";
 import {pickAvatarUrl} from '../lib/pickAvatarUrl'
 import { createClient } from "../lib/supabaseClient";
 import FormModal from "./FormModal";
@@ -57,7 +57,8 @@ const EmployeeFormModal = ( {
 }) => {
 
     const isEdit = mode === 'edit';
-
+  const [createEmployee] = useCreateEmployeeMutation();
+ const [updateEmployee] = useUpdateEmployeeMutation();
 
     const initialValues = isEdit ? 
     {
@@ -133,34 +134,21 @@ const EmployeeFormModal = ( {
         const netSalary =grossSalary - grossSalary * (netPercent / 100);
 
         if(isEdit) {
-            await employeeCRUD.update(employee.id, {
-                fullName: values.fullName.trim(),
-                role: values.role.trim(),
-                city: values.city,
-                status: values.status,
-                salary: grossSalary,
-                netSalaryPercent: netPercent,
-                netSalary,
-            });
+          await updateEmployee({ id: employee.id, payload: {
+               fullName: values.fullName.trim(), role: values.role.trim(), city: values.city,
+               status: values.status, salary: grossSalary, netSalaryPercent: netPercent, netSalary,
+           }}).unwrap();
         } else {
             const dept = DEPARTMENTS.find(d => d.name === values.deptName);
             const id = await generateNextId(dept.prefix);
             const photoUrl = pickAvatarUrl(values.email || values.fullName, values.gender);
 
-            await employeeCRUD.create({
-                id, 
-                fullName: values.fullName.trim(),
-                email: values.email.trim(),
-            deptName: values.deptName.trim(),
-            status: values.status,
-            joinDate: values.joinDate, 
-            role: values.role.trim(),
-            city: values.city, 
-            salary: grossSalary,
-            netSalaryPercent: netPercent,
-            netSalary,
-            PhotoUrl: photoUrl
-            });
+            await createEmployee({
+              id, fullName: values.fullName.trim(), email: values.email.trim(),
+               deptName: values.deptName.trim(), status: values.status, joinDate: values.joinDate,
+               role: values.role.trim(), city: values.city, salary: grossSalary,
+               netSalaryPercent: netPercent, netSalary, PhotoUrl: photoUrl
+           }).unwrap();
         }
 
         onSuccess();

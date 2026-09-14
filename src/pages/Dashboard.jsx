@@ -12,6 +12,7 @@ import { IoPersonAddOutline, IoFilter, IoLocationOutline } from "react-icons/io5
 import { MdSort } from "react-icons/md";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import IconsComp from '../components/IconsComp'
+import { useDeleteEmployeeMutation, useGetEmployeesQuery } from "../store/employeesApi"
 
 const Dashboard = () => {
     const [isFormOpen, setIsFormOpen] = useState(false)
@@ -24,20 +25,14 @@ const Dashboard = () => {
     const [filters, setFilters] = useState({ deptName: null, status: null, city: null })
     const [sortAsc, setSortAsc] = useState(true)
 
-    const { data: employees, loading, error, refetch } = useAsync(
-        () =>
-            employeeCRUD.getAll({
-                orderBy: "fullName",
-                ascending: sortAsc,
-                filters: Object.fromEntries(
-                    Object.entries(filters).filter(([, v]) => v)
-                ),
-             
-                selectQuery: "*, department:DeptId(DeptName, core, Icon)"
-            }),
-        [sortAsc, filters]
-    )
+  const { data: employees, isLoading: loading, error } = useGetEmployeesQuery({
+  orderBy: "fullName",
+  ascending: sortAsc,
+  filters: Object.fromEntries(Object.entries(filters).filter(([, v]) => v)),
+  selectQuery: "*, department:DeptId(DeptName, core, Icon)", // <-- verify this closing ")" is actually present in your file
+})
 
+  const [removeEmployee ] = useDeleteEmployeeMutation()
     const emp = useMemo(() => {
         const list = employees || []
         const seen = new Set()
@@ -66,8 +61,7 @@ const Dashboard = () => {
         if (!deleteTarget) return
         setDeleting(true)
         try {
-            await employeeCRUD.remove(deleteTarget.id)
-            await refetch()
+            await removeEmployee(deleteTarget.id).unwrap()
         } finally {
             setDeleting(false)
             setDeleteTarget(null)
