@@ -35,7 +35,7 @@ const LoginPage = () => {
 
     return (
         <section
-            className="relative w-full h-dvh overflow-hidden bg-cover bg-center bg-no-repeat flex flex-col items-end justify-center gap-5 px-6 md:px-24 lg:px-48"
+            className="relative w-full h-dvh overflow-hidden bg-cover bg-center bg-no-repeat flex flex-col items-end justify-center gap-5 px-6 md:px-24 lg:px-32"
             style={{ backgroundImage: `url(${loginBG})` }}
         >
             <motion.form
@@ -43,7 +43,7 @@ const LoginPage = () => {
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
                 onSubmit={handleSubmit}
-                className="bg-[#F9F9F8] w-1/3 p-5 rounded-2xl shadow-xl shadow-[#2C2C2E] flex flex-col gap-5"
+                className="bg-[#F9F9F8] w-1/2 p-5 rounded-2xl shadow-xl shadow-[#2C2C2E] flex flex-col gap-5"
             >
                 <div className="text-center">
                     <h2 className="text-3xl">Welcome Back!</h2>
@@ -107,7 +107,7 @@ const LoginPage = () => {
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full h-10 bg-[#639987] rounded-lg text-[#F9F9F8] font-bold text-lg flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-60 disabled:hover:scale-100"
+                    className="w-full h-10 bg-[#639987] rounded-lg text-[#F9F9F8] font-bold text-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all duration-300 disabled:opacity-60 disabled:hover:scale-100"
                 >
                     {isSubmitting ? "Signing In..." : (
                         <>Sign In <FaArrowRight style={{ color: "#F9F9F8" }} size={16} /></>
