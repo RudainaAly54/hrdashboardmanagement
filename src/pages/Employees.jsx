@@ -5,12 +5,7 @@ import QuickFilters from "../components/QuickFilters";
 import MoreFiltersPanel from "../components/MoreFiltersPanel";
 import EmployeeFormModal from '../components/EmployeeFormModal';
 import ConfirmDialog from '../components/CofirmDialog'
-import SkeletonLoader from "../components/SkeletonLoader";
-
-/* Libraries */
 import { motion } from "framer-motion"
-
-/* Hooks & Context */
 import { useState, useEffect } from "react"
 import { createClient } from "../lib/supabaseClient"
 import { useOutletContext, Link } from "react-router-dom"
@@ -18,16 +13,12 @@ import { downloadCSV } from '../lib/downloadCSV'
 import { useToast } from "../context/ToastContext";
 import { employeeCRUD } from "../api/api";
 import { useGetEmployeesPageQuery, useDeleteEmployeeMutation, useBulkDeleteEmployeesMutation } from "../store/employeesApi";
-
-/* Icons */
 import { FiDownload, FiPlus, FiEdit2, FiTrash2 } from "react-icons/fi";
 import { FaUsers } from "react-icons/fa";
 import { FaUmbrellaBeach } from "react-icons/fa6";
 import { HiOutlineSparkles } from "react-icons/hi2";
+import SkeletonLoader from "../components/SkeletonLoader";
 
-// employeeCRUD.count() only supports exact-match (.eq) filters, and export
-// pulls the full unpaginated dataset — neither is cacheable list state, so
-// both still go straight through supabase / the shared CRUD, not RTK Query.
 const supabase = createClient();
 const TABLE_NAME = 'Employees';
 const PAGE_SIZE = 5;
@@ -247,7 +238,7 @@ const Employees = () => {
                     <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-1">
                         <div className="flex items-center justify-between">
                             <p className="text-xs text-gray-500 uppercase tracking-wide">Total Staff</p>
-                            <FaUsers className="text-[#639987]" size={18} />
+                            
                         </div>
                         <p className="text-2xl font-bold">{totalCount.toLocaleString()}</p>
                     </div>
@@ -255,7 +246,7 @@ const Employees = () => {
                     <div className="border border-gray-200 rounded-xl p-4 flex flex-col gap-1">
                         <div className="flex items-center justify-between">
                             <p className="text-xs text-gray-500 uppercase tracking-wide">On Leave</p>
-                            <FaUmbrellaBeach className="text-[#639987]" size={18} />
+                            
                         </div>
                         <div className="flex items-baseline gap-2">
                             <p className="text-2xl font-bold">{onLeaveCount}</p>
@@ -268,7 +259,7 @@ const Employees = () => {
                     <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-1">
                         <div className="flex items-center justify-between">
                             <p className="text-xs text-gray-500 uppercase tracking-wide">New Hires</p>
-                            <HiOutlineSparkles className="text-[#639987]" size={18} />
+                            
                         </div>
                         <div className="flex items-baseline gap-2">
                             <p className="text-2xl font-bold">{newHiresCount}</p>

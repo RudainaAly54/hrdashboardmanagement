@@ -1,8 +1,8 @@
 const statusStyles = {
-    Active: "bg-green-100 text-green-700",
-    "On Leave": "bg-orange-100 text-orange-700",
-    Terminated: "bg-red-100 text-red-700",
-    Remote: "bg-blue-100 text-blue-700",
+    Active: " text-green-700",
+    "On Leave": "text-yellow-700",
+    Terminated: "text-red-700",
+    Remote: "text-blue-700",
 };
 
 const StatusBadge = ({ status }) => {

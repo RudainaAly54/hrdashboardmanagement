@@ -5,11 +5,11 @@ import { useGetDepartmentByIdQuery, useDeleteDepartmentMutation } from "../store
 import { useGetEmployeesQuery, useDeleteEmployeeMutation } from "../store/employeesApi";
 import { useToast } from "../context/ToastContext";
 import StatusBadge from "../components/StatusBadge";
-import IconsComp from "../components/IconsComp";
 import DepartmentModal from "../components/DepartmentModal";
 import EmployeeFormModal from "../components/EmployeeFormModal";
 import ConfirmDialog from "../components/CofirmDialog";
-import { FiArrowLeft, FiEdit2, FiTrash2, FiUsers, FiDollarSign } from "react-icons/fi";
+import { FiArrowLeft, FiEdit2, FiTrash2 } from "react-icons/fi";
+import SkeletonLoader from "../components/SkeletonLoader";
 
 const DepartmentsDetails = () => {
     const { id } = useParams();
@@ -90,7 +90,7 @@ const DepartmentsDetails = () => {
     };
 
     if (loading) {
-        return <div className="p-6 text-gray-400">Loading department...</div>;
+        return <SkeletonLoader />;
     }
 
     if (message || !department) {
@@ -136,15 +136,10 @@ const DepartmentsDetails = () => {
             </div>
 
             <div className="bg-white border border-gray-200 rounded-xl p-6 flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-[#f0f5f3] flex items-center justify-center flex-shrink-0">
-                    <IconsComp iconName={department.Icon} className="text-[#639987]" size={28} />
-                </div>
                 <div>
                     <div className="flex items-center gap-3">
-                        <h1 className="text-2xl font-bold font-[manrope]">{department.DeptName}</h1>
-                        <span className="px-3 py-1 rounded-full bg-[#639987]/10 text-[#639987] text-xs font-medium">
-                            {department.core}
-                        </span>
+                        <h1 className="text-2xl font-bold ">{department.DeptName}</h1>
+                        
                     </div>
                     <p className="text-gray-500 text-sm mt-1">
                         Head of Dept.{" "}
@@ -155,26 +150,21 @@ const DepartmentsDetails = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between">
-                        <p className="text-xs text-gray-500 uppercase">Total Employees</p>
-                        <FiUsers className="text-[#639987]" size={18} />
-                    </div>
+                    <p className="text-xs text-gray-500 uppercase">Category</p>
+                    <p className="text-2xl font-bold mt-1">{department.core}</p>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <p className="text-xs text-gray-500 uppercase">Total Employees</p>
                     <p className="text-2xl font-bold mt-1">{employees.length}</p>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between">
                         <p className="text-xs text-gray-500 uppercase">Active</p>
-                        <FiUsers className="text-[#639987]" size={18} />
-                    </div>
                     <p className="text-2xl font-bold mt-1">{activeCount}</p>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between">
                         <p className="text-xs text-gray-500 uppercase">Total Salary / Month</p>
-                        <FiDollarSign className="text-[#639987]" size={18} />
-                    </div>
                     <p className="text-2xl font-bold mt-1">
                         {totalSalary.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 })}
                     </p>
@@ -211,7 +201,9 @@ const DepartmentsDetails = () => {
                                                 className="w-9 h-9 rounded-full object-cover"
                                             />
                                             <div>
-                                                <p className="font-medium">{emp.fullName}</p>
+                                                <p
+                                                onClick = {() => navigate(`/employees/empDetails/${emp.id}`)} 
+                                                className="font-medium hover:text-[#639987] cursor-pointer">{emp.fullName}</p>
                                                 <p className="text-xs text-gray-400">{emp.email}</p>
                                             </div>
                                         </div>

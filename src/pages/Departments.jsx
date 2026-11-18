@@ -6,11 +6,11 @@ import { useToast } from '../context/ToastContext'
 import { FiPlus, FiFilter } from "react-icons/fi";
 import { FaUsers } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa";
-import IconsComp from '../components/IconsComp'
+import SkeletonLoader from "../components/SkeletonLoader";
 import DepartmentModal from '../components/DepartmentModal'
 import DepartmentFilterPanel from '../components/DepartmentFilterPanel'
 import ConfirmDialog from '../components/CofirmDialog'
-import SkeletonLoader from '../components/SkeletonLoader'
+
 
 const Departments = () => {
     const { search } = useOutletContext()
@@ -25,7 +25,6 @@ const Departments = () => {
     const [removeDepartment] = useDeleteDepartmentMutation();
 
     const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [editingDept, setEditingDept] = useState(null);
     const [deletingDept, setDeletingDept] = useState(null);
     const [removingDept, setRemovingDept] = useState(false);
 
@@ -33,8 +32,7 @@ const Departments = () => {
     const [category, setCategory] = useState(null);
     const [sortBy, setSortBy] = useState("alphabetical");
 
-    // Filtering + sorting client-side since we already have the whole
-    // (small) departments table in memory.
+
     const filteredDepartments = useMemo(() => {
         if (!departments) return [];
 
@@ -88,7 +86,7 @@ const Departments = () => {
         >
             <div className='flex items-center justify-between flex-wrap gap-4'>
                 <div>
-                    <h1 className='text-2xl font-bold font-[manrope]'>Organization Units</h1>
+                    <h1 className='text-2xl font-bold '>Organization Units</h1>
                     <p className='text-gray-500 text-sm'>
                         Manage departmental hierarchies and team distribution across the enterprise.
                     </p>
@@ -142,27 +140,21 @@ const Departments = () => {
                     filteredDepartments.map((dept) => (
                         <div
                             key={dept.id}
-                            className='bg-white border border-gray-200 rounded-xl p-5 flex flex-col'
+                            onClick = {() => navigate(`/departments/deptDetails/${dept.id}`)}
+                            className='bg-white border border-gray-200 rounded-xl p-4 flex flex-col cursor-pointer'
                         >
-                            <div className='flex items-center justify-between mb-5'>
-                                <div className='w-10 h-10 rounded-lg bg-[#f0f5f3] flex items-center justify-center text-lg'>
-                                    <IconsComp iconName={dept.Icon} className='text-[#639987]' size={20} />
-                                </div>
-                                <span className='px-3 py-1 rounded-full bg-[#639987]/10 text-[#639987] text-sm font-medium'>
-                                    {dept.core}
-                                </span>
-                            </div>
-
-                            <button
+                           
+                   
+                             <button
                                 onClick={() => navigate(`/departments/deptDetails/${dept.id}`)}
                                 className='mb-5 text-left'
                             >
-                                <h3 className='font-semibold text-lg hover:text-[#639987] transition'>{dept.DeptName}</h3>
+                                  <h3 className='font-semibold text-xl hover:text-[#639987] transition cursor-pointer'>{dept.DeptName}</h3>
                                 <p className='text-sm text-gray-500 flex items-center gap-1'>
                                     {dept.NoEmployees} Employees
                                 </p>
                             </button>
-
+                            
                             <div className='flex items-center gap-2 pt-3 border-t'>
                                 {dept.Employees?.PhotoUrl ? (
      <img

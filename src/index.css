@@ -2,6 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+.dark { color-scheme: dark; }
+.dark body { background: #161718; color: #f1f1f0; }
+.dark .bg-white,
+.dark .bg-\[\#F9F9F8\],
+.dark .bg-\[\#f9f9f8\] { background-color: #1f2022; }
+.dark main.bg-\[\#f9f9f8\] { background-color: #161718; }
+.dark .bg-gray-50,
+.dark .bg-gray-100,
+.dark .hover\:bg-gray-50:hover,
+.dark .hover\:bg-gray-100:hover { background-color: #2a2b2d; }
+.dark .bg-red-50 { background-color: #3a1f1f; }
+.dark .bg-\[\#f0f5f3\] { background-color: #263530; }
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-300,
+.dark .border-b,
+.dark .border-t,
+.dark .border { border-color: #3a3b3d; }
+.dark .border-black { border-color: #e5e7eb; }
+.dark .text-gray-400 { color: #9ca3af; }
+.dark .text-gray-500,
+.dark .text-gray-600 { color: #b4b8bd; }
+.dark .text-gray-700,
+.dark .text-black { color: #e5e7eb; }
+.dark input,
+.dark select { color: #f1f1f0; }
+.dark input::placeholder { color: #8a8f94; }
+
+
 ::-webkit-scrollbar{
    display: block;
     width: 7px;

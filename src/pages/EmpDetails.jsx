@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useGetEmployeeByIdQuery, useDeleteEmployeeMutation } from '../store/employeesApi'
 import { useToast } from "../context/ToastContext";
-import StatusBadge from "../components/StatusBadge";
 import EmployeeFormModal from "../components/EmployeeFormModal";
 import ConfirmDialog from "../components/CofirmDialog";
-import { FiArrowLeft, FiEdit2, FiTrash2, FiMail, FiMapPin, FiDollarSign, FiCalendar, FiBriefcase, FiPercent  } from "react-icons/fi";
+import { FiArrowLeft, FiEdit2, FiTrash2 } from "react-icons/fi";
+import SkeletonLoader from "../components/SkeletonLoader";
 
 const EmpDetails = () => {
     const {id} = useParams();
@@ -43,7 +43,7 @@ const handleDelete = async () => {
 }
 
 if (loading) {
-    return <div className="p-6 text-gray-400">Loading employee...</div>;
+    return <SkeletonLoader />;
 }
 
 if (message || !employee) {
@@ -66,9 +66,9 @@ return (
         <div className="flex items-center justify-between flex-wrap gap-4">
             <button
             onClick={() => navigate("/employees")}
-            className="flex items-center gap- text-sm text-gray-500 hover:text-gray-700"
+            className="flex items-center justify-center gap-1 text-sm text-gray-500 hover:text-gray-700"
             >
-                 <FiArrowLeft size={16}/> Back to Employees
+                 <FiArrowLeft size={16}/> <p> Back to Employees</p>
             </button>
 
             <div className="flex gap-3">
@@ -76,7 +76,7 @@ return (
                 onClick={() => setIsEditOpen(true)}
                 className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50"
                 >
-  <FiEdit2 size={14} /> Edit
+                  <FiEdit2 size={14} /> Edit
                 </button>
 
                 <button 
@@ -103,7 +103,7 @@ return (
             <div className="flex-1 min-w-[200px]">
                 <div className="flex items-center gap-3 flex-wrap">
                     <h1 className="text-2xl font-bold font-[manrope]">
-                        {employee.fullName} <StatusBadge status={employee.status}/>
+                        {employee.fullName}
                     </h1>
                 </div>
 
@@ -115,37 +115,26 @@ return (
         {/* Details Card */}
         <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-            <div className="bg-white border-gray-200 rounded-xl p-4  flex items-start gap-3">
-                <FiMail className="text-[#639987] mt-1" size= {18}/>
-
-                <div>
+            <div className="bg-white border-gray-200 rounded-xl p-4  flex flex-col items-start gap-1">
+                
                     <p className="text-sm text-gray-500 uppercase">Email</p>
                     <p className="text-sm font-medium break-all">{employee.email}</p>
-                </div>
             </div>
         
-            <div className="bg-white border-gray-200 rounded-xl p-4  flex items-start gap-3">
-                <FiBriefcase className="text-[#639987] mt-1" size= {18}/>
-
-                <div>
+            <div className="bg-white border-gray-200 rounded-xl p-4  flex flex-col items-start gap-1">
                     <p className="text-sm text-gray-500 uppercase">Department</p>
                     <p className="text-sm font-medium break-all">{employee.deptName}</p>
-                </div>
             </div>
         
-            <div className="bg-white border-gray-200 rounded-xl p-4  flex items-start gap-3">
-                <FiMapPin className="text-[#639987] mt-1" size= {18}/>
-
-                <div>
+            <div className="bg-white border-gray-200 rounded-xl p-4  flex flex-col items-start gap-3">
+                
                     <p className="text-sm text-gray-500 uppercase">City</p>
                     <p className="text-sm font-medium break-all">{employee.city}</p>
-                </div>
+               
             </div>
         
-            <div className="bg-white border-gray-200 rounded-xl p-4  flex items-start gap-3">
-                <FiCalendar className="text-[#639987] mt-1" size= {18}/>
-
-                <div>
+            <div className="bg-white border-gray-200 rounded-xl p-4  flex flex-col items-start gap-3">
+                
                     <p className="text-sm text-gray-500 uppercase">Join Date</p>
                     <p className="text-sm font-medium break-all">
                         {employee.joinDate ? 
@@ -154,25 +143,22 @@ return (
                     )     : "-"
                     }
                     </p>
-                </div>
+               
             </div>
         
-            <div className="bg-white border-gray-200 rounded-xl p-4  flex items-start gap-3">
-                <FiDollarSign className="text-[#639987] mt-1" size= {18}/>
-
-                <div>
+            <div className="bg-white border-gray-200 rounded-xl p-4  flex flex-col items-start gap-3">
+               
                     <p className="text-sm text-gray-500 uppercase">Salary</p>
                     <p className="text-sm font-medium break-all">
                      {Number(employee.salary).toLocaleString(undefined, 
                         {style: "currency", currency: 'EGP', maximumFractionDigits: 0}
                      )}
                     </p>
-                </div>
+               
             </div>
 
-               <div className="bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-3">
-                    <FiPercent className="text-[#639987] mt-1" size={18} />
-                    <div>
+               <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col items-start gap-3">
+                  
                         <p className="text-xs text-gray-500 uppercase">Net Salary</p>
                         <p className="text-sm font-medium">
                             {employee.netSalary != null
@@ -182,7 +168,7 @@ return (
                                 <span className="text-xs text-gray-400 ml-1">({employee.netSalaryPercent}% of gross)</span>
                             )}
                         </p>
-                    </div>
+                    
                 </div>
         </div>
 
