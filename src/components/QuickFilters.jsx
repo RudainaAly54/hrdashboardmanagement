@@ -1,24 +1,26 @@
+import { usePreferences } from "../context/PreferencesContext"
 import { FiX, FiFilter } from "react-icons/fi";
 
 const filterLabels = {
-    deptName: "Department",
-    status: "Status",
-    city: "Location",
+    deptName: "common.department",
+    status: "common.status",
+    city: "common.location",
 };
 
 const QuickFilters = ({ filters, onRemoveFilter, onClearAll, onOpenMore }) => {
+    const { t } = usePreferences()
     const activeEntries = Object.entries(filters).filter(([, value]) => value);
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between">
-                <p className="font-medium text-sm">Quick Filters</p>
+                <p className="font-medium text-sm">{t("qf.title")}</p>
                 {activeEntries.length > 0 && (
                     <button
                         onClick={onClearAll}
                         className="text-xs text-[#639987] font-medium hover:underline"
                     >
-                        Clear all
+                        {t("qf.clear")}
                     </button>
                 )}
             </div>
@@ -29,7 +31,7 @@ const QuickFilters = ({ filters, onRemoveFilter, onClearAll, onOpenMore }) => {
                         key={key}
                         className="flex items-center gap-1 px-3 py-1 rounded-full bg-[#639987] text-[#F9F9F8] text-xs font-medium"
                     >
-                        {filterLabels[key]}: {value}
+                        {t(filterLabels[key])}: {value}
                         <button onClick={() => onRemoveFilter(key)} className="hover:opacity-70">
                             <FiX size={12} />
                         </button>
@@ -40,7 +42,7 @@ const QuickFilters = ({ filters, onRemoveFilter, onClearAll, onOpenMore }) => {
                     onClick={onOpenMore}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition ml-auto"
                 >
-                    <FiFilter size={14} /> More Filters
+                    <FiFilter size={14} /> {t("qf.more")}
                 </button>
             </div>
         </div>

@@ -1,3 +1,4 @@
+import { usePreferences } from "../context/PreferencesContext"
 /* Field
 {
 name : "fullName",
@@ -28,6 +29,7 @@ const FormModal = ({
     savingLabel = "Saving ...",
     maxWidth = "max-w-lg"
 }) => {
+    const { t } = usePreferences()
     const [values, setValues] = useState({})
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState("")
@@ -138,7 +140,7 @@ const FormModal = ({
                             disabled={saving}
                             className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-lg disabled:opacity-50"
                         >
-                            Cancel
+                            {t("common.cancel")}
                         </button>
                         <button
                             type="submit"

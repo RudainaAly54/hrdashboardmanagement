@@ -1,3 +1,4 @@
+import { usePreferences } from "../context/PreferencesContext"
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -9,6 +10,7 @@ import { FiArrowLeft, FiEdit2, FiTrash2 } from "react-icons/fi";
 import SkeletonLoader from "../components/SkeletonLoader";
 
 const EmpDetails = () => {
+    const { t } = usePreferences()
     const {id} = useParams();
     const navigate = useNavigate();
     const {showToast} = useToast();
@@ -68,7 +70,7 @@ return (
             onClick={() => navigate("/employees")}
             className="flex items-center justify-center gap-1 text-sm text-gray-500 hover:text-gray-700"
             >
-                 <FiArrowLeft size={16}/> <p> Back to Employees</p>
+                 <FiArrowLeft size={16}/> <p>{t("emp.back")}</p>
             </button>
 
             <div className="flex gap-3">
@@ -76,7 +78,7 @@ return (
                 onClick={() => setIsEditOpen(true)}
                 className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50"
                 >
-                  <FiEdit2 size={14} /> Edit
+                  <FiEdit2 size={14} /> {t("common.edit")}
                 </button>
 
                 <button 
@@ -84,7 +86,7 @@ return (
                 className="flex items-center gap-2 px-4 py-2 border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50"
                 >
 
-                      <FiTrash2 size={14} /> Delete
+                      <FiTrash2 size={14} /> {t("common.delete")}
                 </button>
             </div>
         </div>
@@ -108,7 +110,7 @@ return (
                 </div>
 
                 <p className="text-gray-500 text-sm mt-1">{employee.role}</p>
-                <p className="text-sm text-gray-400 mt-1">Employee ID: {employee.id}</p>
+                <p className="text-sm text-gray-400 mt-1">{t("emp.id")}: {employee.id}</p>
             </div>
         </div>
 
@@ -117,25 +119,25 @@ return (
 
             <div className="bg-white border-gray-200 rounded-xl p-4  flex flex-col items-start gap-1">
                 
-                    <p className="text-sm text-gray-500 uppercase">Email</p>
+                    <p className="text-sm text-gray-500 uppercase">{t("common.email")}</p>
                     <p className="text-sm font-medium break-all">{employee.email}</p>
             </div>
         
             <div className="bg-white border-gray-200 rounded-xl p-4  flex flex-col items-start gap-1">
-                    <p className="text-sm text-gray-500 uppercase">Department</p>
+                    <p className="text-sm text-gray-500 uppercase">{t("common.department")}</p>
                     <p className="text-sm font-medium break-all">{employee.deptName}</p>
             </div>
         
             <div className="bg-white border-gray-200 rounded-xl p-4  flex flex-col items-start gap-3">
                 
-                    <p className="text-sm text-gray-500 uppercase">City</p>
+                    <p className="text-sm text-gray-500 uppercase">{t("common.city")}</p>
                     <p className="text-sm font-medium break-all">{employee.city}</p>
                
             </div>
         
             <div className="bg-white border-gray-200 rounded-xl p-4  flex flex-col items-start gap-3">
                 
-                    <p className="text-sm text-gray-500 uppercase">Join Date</p>
+                    <p className="text-sm text-gray-500 uppercase">{t("common.joinDate")}</p>
                     <p className="text-sm font-medium break-all">
                         {employee.joinDate ? 
                     new Date(employee.joinDate).toLocaleDateString("en-US", 
@@ -148,7 +150,7 @@ return (
         
             <div className="bg-white border-gray-200 rounded-xl p-4  flex flex-col items-start gap-3">
                
-                    <p className="text-sm text-gray-500 uppercase">Salary</p>
+                    <p className="text-sm text-gray-500 uppercase">{t("common.salary")}</p>
                     <p className="text-sm font-medium break-all">
                      {Number(employee.salary).toLocaleString(undefined, 
                         {style: "currency", currency: 'EGP', maximumFractionDigits: 0}
@@ -159,7 +161,7 @@ return (
 
                <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col items-start gap-3">
                   
-                        <p className="text-xs text-gray-500 uppercase">Net Salary</p>
+                        <p className="text-xs text-gray-500 uppercase">{t("common.netSalary")}</p>
                         <p className="text-sm font-medium">
                             {employee.netSalary != null
                                 ? Number(employee.netSalary).toLocaleString(undefined, { style: "currency", currency: "EGP", maximumFractionDigits: 0 })
@@ -184,7 +186,7 @@ return (
 
         <ConfirmDialog
         isOpen={isDeleteOpen}
-        title="Delete this employee"
+        title={t("emp.deleteTitle")}
         message={`"${employee.fullName}" will be permanently removed from the system `}
         onConfirm={handleDelete}
         onCancel = {() => setIsDeleteOpen(false)}

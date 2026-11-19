@@ -1,3 +1,4 @@
+import { usePreferences } from "../context/PreferencesContext"
 /* Libraries */
 import {useState, useEffect, useMemo} from 'react'
 import {motion, AnimatePresence} from 'framer-motion'
@@ -41,6 +42,7 @@ const monthShort = m => new Date(2000, m, 1).toLocaleDateString("en-US", {
 const deptBarColors = ["#639987", "#a8c3b9", "#2f4f42", "#8f8f8f"]
 
 const Reports = () => {
+    const { t } = usePreferences()
     const {showToast} = useToast()
     const [year, setYear] = useState(new Date().getFullYear())
     const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -200,7 +202,7 @@ const Reports = () => {
             {/* Header row */}
             <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
-                    <h1 className="text-4xl font-bold ">Reports &amp; Insights</h1>
+                    <h1 className="text-4xl font-bold ">{t("rep.title")}</h1>
                     <p className="text-gray-500 text-sm mt-1">
                         Real-time analytical overview of your enterprise workforce health.
                     </p>
@@ -218,19 +220,19 @@ const Reports = () => {
                         disabled={exporting}
                         className="flex items-center gap-2 px-4 py-2 bg-[#2f4f42] text-[#F9F9F8] rounded-full text-sm font-medium hover:bg-[#264036] transition disabled:opacity-60"
                     >
-                        <FiDownload size={14} /> {exporting ? "Exporting..." : "Export Report"}
+                        <FiDownload size={14} /> {exporting ? t("common.exporting") : t("common.exportReport")}
                     </button>
  
                     {isFilterOpen && (
                         <div className="absolute right-0 top-12 z-20 bg-white border border-gray-200 rounded-xl shadow-lg p-4 w-64 flex flex-col gap-3">
                             <div>
-                                <label className="text-xs text-gray-500 uppercase">Department</label>
+                                <label className="text-xs text-gray-500 uppercase">{t("common.department")}</label>
                                 <select
                                     value={deptFilter}
                                     onChange={(e) => setDeptFilter(e.target.value)}
                                     className="w-full mt-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
                                 >
-                                    <option value="">All Departments</option>
+                                    <option value="">{t("common.allDepartments")}</option>
                                     {deptOptions.map((d) => (
                                         <option key={d} value={d}>{d}</option>
                                     ))}
@@ -240,7 +242,7 @@ const Reports = () => {
                                 onClick={() => setIsFilterOpen(false)}
                                 className="px-4 py-2 text-sm bg-[#639987] text-[#F9F9F8] rounded-lg hover:bg-[#557f70]"
                             >
-                                Apply
+                                {t("common.apply")}
                             </button>
                         </div>
                     )}
@@ -259,11 +261,11 @@ const Reports = () => {
                         </span>
                     </div>
                     <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide">Total Employees</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">{t("rep.totalEmployees")}</p>
                         <p className="text-4xl font-bold mt-1">{loading ? "—" : totalEmployees.toLocaleString()}</p>
                     </div>
                     <div className="flex items-center justify-between text-sm text-gray-500 border-t pt-3">
-                        <span>Active this month</span>
+                        <span>{t("rep.activeMonth")}</span>
                         <span className="font-semibold text-gray-800">{loading ? "—" : activeThisMonth}</span>
                     </div>
                 </div>
@@ -278,11 +280,11 @@ const Reports = () => {
                         </span>
                     </div>
                     <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide">Avg Attendance</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">{t("rep.avgAtt")}</p>
                         <p className="text-4xl font-bold mt-1">{loading ? "—" : `${avgAttendance}%`}</p>
                     </div>
                     <div className="flex items-center justify-between text-sm text-gray-500 border-t pt-3">
-                        <span>Industry average</span>
+                        <span>{t("rep.industry")}</span>
                         <span className="font-semibold text-gray-800">88.2%</span>
                     </div>
                 </div>
@@ -297,11 +299,11 @@ const Reports = () => {
                         </span>
                     </div>
                     <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide">Monthly Payroll</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">{t("rep.monthlyPayroll")}</p>
                         <p className="text-4xl font-bold mt-1">{loading ? "—" : currency(monthlyPayroll)}</p>
                     </div>
                     <div className="flex items-center justify-between text-sm text-gray-500 border-t pt-3">
-                        <span>Budget utilization</span>
+                        <span>{t("rep.budget")}</span>
                         <span className="font-semibold text-gray-800">{loading ? "—" : `${budgetUtilization}%`}</span>
                     </div>
                 </div>
@@ -312,8 +314,8 @@ const Reports = () => {
                 <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-5">
                     <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
                         <div>
-                            <h2 className="text-lg font-bold">Hiring Statistics</h2>
-                            <p className="text-sm text-gray-500">New hires (Last 12 months)</p>
+                            <h2 className="text-lg font-bold">{t("rep.hiring")}</h2>
+                            <p className="text-sm text-gray-500">{t("rep.newHires12")}</p>
                         </div>
                         <div className="relative">
                             <select
@@ -335,7 +337,7 @@ const Reports = () => {
                                 labels: hiringData.map((_, i) => monthShort(i)),
                                 datasets: [
                                     {
-                                        label: "New Hires",
+                                        label: t("emp.newHires"),
                                         data: hiringData,
                                         backgroundColor: "#e9e9e7",
                                         hoverBackgroundColor: "#639987",
@@ -361,12 +363,12 @@ const Reports = () => {
                 </div>
  
                 <div className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-col">
-                    <h2 className="text-lg font-bold">Departments</h2>
-                    <p className="text-sm text-gray-500 mb-4">Employee allocation by unit</p>
+                    <h2 className="text-lg font-bold">{t("rep.departments")}</h2>
+                    <p className="text-sm text-gray-500 mb-4">{t("rep.allocation")}</p>
  
                     <div className="flex flex-col gap-4 flex-1">
                         {visibleDepts.length === 0 ? (
-                            <p className="text-sm text-gray-400">No department data yet</p>
+                            <p className="text-sm text-gray-400">{t("rep.noDept")}</p>
                         ) : (
                             visibleDepts.map((d, i) => (
                                 <div key={d.name}>
@@ -390,7 +392,7 @@ const Reports = () => {
                             onClick={() => setShowAllDepts((v) => !v)}
                             className="mt-4 border border-gray-200 rounded-lg py-2.5 text-sm font-medium hover:bg-gray-50 transition"
                         >
-                            {showAllDepts ? "Show Less" : "View Detailed Distribution"}
+                            {showAllDepts ? t("pay.showLess") : t("rep.viewDist")}
                         </button>
                     )}
                 </div>
@@ -400,12 +402,12 @@ const Reports = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-5">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-bold">Generated Reports</h2>
+                        <h2 className="text-lg font-bold">{t("rep.generated")}</h2>
                         <button
                             onClick={() => setShowArchives((v) => !v)}
                             className="text-sm text-[#639987] font-medium hover:underline"
                         >
-                            {showArchives ? "Hide Archives" : "View Archives"}
+                            {showArchives ? t("rep.hideArch") : t("rep.viewArch")}
                         </button>
                     </div>
  
@@ -452,7 +454,7 @@ const Reports = () => {
  
                 {!insightDismissed && (
                     <div className="bg-[#2f4f42] text-white rounded-2xl p-5 flex flex-col gap-4">
-                        <h2 className="text-lg font-bold">Automated Insight</h2>
+                        <h2 className="text-lg font-bold">{t("rep.insight")}</h2>
                         <p className="text-sm text-white/80">
                             Based on last month's data, your retention rate in the Engineering department has improved
                             by <span className="font-semibold underline">14%</span> compared to the previous quarter.
@@ -470,13 +472,13 @@ const Reports = () => {
                                 onClick={() => setInsightExpanded((v) => !v)}
                                 className="bg-white text-[#2f4f42] rounded-lg py-2 text-sm font-medium hover:bg-gray-100"
                             >
-                                {insightExpanded ? "Hide Analysis" : "View Analysis"}
+                                {insightExpanded ? t("rep.hideAnalysis") : t("rep.viewAnalysis")}
                             </button>
                             <button
                                 onClick={() => setInsightDismissed(true)}
                                 className="border border-white/30 rounded-lg py-2 text-sm font-medium hover:bg-white/10"
                             >
-                                Dismiss
+                                {t("common.dismiss")}
                             </button>
                         </div>
                     </div>

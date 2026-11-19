@@ -1,3 +1,4 @@
+import { usePreferences } from "../context/PreferencesContext"
 /* Components */
 import Pagination from "../components/Pagination";
 import SkeletonLoader from "../components/SkeletonLoader";
@@ -44,13 +45,14 @@ const statusStyles = {
     Failed: "bg-red-100 text-red-700",
 };
 
-const StatusBadge = ({ status }) => (
+const StatusBadge = ({ status, label }) => (
     <span className={`px-3 py-1 rounded-full text-xs font-medium inline-block ${statusStyles[status] || "bg-gray-100 text-gray-700"}`}>
-        {status}
+        {label ?? status}
     </span>
 );
 
 const Payroll = () => {
+    const { t } = usePreferences()
     const { showToast } = useToast();
 
     // Full unpaginated dataset — used only to compute stats/charts, which
@@ -268,8 +270,8 @@ const Payroll = () => {
         >
             <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold">Payroll Overview</h1>
-                    <p className="text-gray-500 text-sm">Enterprise-wide compensation summary and payment history.</p>
+                    <h1 className="text-2xl font-bold">{t("pay.title")}</h1>
+                    <p className="text-gray-500 text-sm">{t("pay.subtitle")}</p>
                 </div>
             </div>
 
@@ -277,7 +279,7 @@ const Payroll = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white border border-gray-200 rounded-xl p-5 flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide">Total Monthly Payroll</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">{t("pay.monthly")}</p>
                         <p className="text-3xl font-bold mt-1">
                             {statsLoading ? "—" : currency(latestMonth?.[1])}
                         </p>
@@ -292,7 +294,7 @@ const Payroll = () => {
                 </div>
 
                 <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide">Upcoming Cycle</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">{t("pay.cycle")}</p>
                     <p className="text-xl font-bold mt-1">
                         {latestPeriod
                             ? new Date(latestPeriod.payPeriodEnd).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
@@ -310,9 +312,9 @@ const Payroll = () => {
                 </div>
 
                 <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide">Approved Requests</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">{t("pay.approved")}</p>
                     <p className="text-xl font-bold mt-1">{approvedCount} / {latestPeriodRows.length}</p>
-                    <p className="text-sm text-gray-500 mt-1">{pendingCount} pending review</p>
+                    <p className="text-sm text-gray-500 mt-1">{pendingCount} {t("pay.pendingReview")}</p>
                 </div>
             </div>
 
@@ -320,19 +322,19 @@ const Payroll = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-5">
                     <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
-                        <h2 className="text-lg font-bold">Total Salary Distribution</h2>
+                        <h2 className="text-lg font-bold">{t("pay.dist")}</h2>
                         <div className="flex bg-gray-100 rounded-full p-1">
                             <button
                                 onClick={() => setChartMode("department")}
                                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${chartMode === "department" ? "bg-[#639987] text-white" : "text-gray-600"}`}
                             >
-                                By Department
+                                {t("pay.byDept")}
                             </button>
                             <button
                                 onClick={() => setChartMode("month")}
                                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${chartMode === "month" ? "bg-[#639987] text-white" : "text-gray-600"}`}
                             >
-                                By Month
+                                {t("pay.byMonth")}
                             </button>
                         </div>
                     </div>
@@ -340,7 +342,7 @@ const Payroll = () => {
                     <div style={{ height: 260 }}>
                         {chartData.labels.length === 0 ? (
                             <div className="h-full flex items-center justify-center text-sm text-gray-400">
-                                No payroll data yet
+                                {t("pay.noPayroll")}
                             </div>
                         ) : (
                             <Bar
@@ -348,7 +350,7 @@ const Payroll = () => {
                                     labels: chartData.labels,
                                     datasets: [
                                         {
-                                            label: "Net Salary",
+                                            label: t("common.netSalary"),
                                             data: chartData.values,
                                             backgroundColor: "#a8c3b9",
                                             hoverBackgroundColor: "#2f4f42",
@@ -381,10 +383,10 @@ const Payroll = () => {
                 </div>
 
                 <div className="bg-white border border-gray-200 rounded-xl p-5 flex flex-col">
-                    <h2 className="text-lg font-bold mb-4">Top Departments</h2>
+                    <h2 className="text-lg font-bold mb-4">{t("pay.topDepts")}</h2>
                     <div className="flex flex-col gap-4">
                         {visibleDepts.length === 0 ? (
-                            <p className="text-sm text-gray-400">No data yet</p>
+                            <p className="text-sm text-gray-400">{t("common.noData")}</p>
                         ) : (
                             visibleDepts.map(([dept, total]) => (
                                 <div key={dept}>
@@ -408,7 +410,7 @@ const Payroll = () => {
                             onClick={() => setShowAllDepts((v) => !v)}
                             className="mt-auto pt-4 flex items-center justify-center gap-1 border border-gray-200 rounded-lg py-2 text-sm font-medium hover:bg-gray-50"
                         >
-                            {showAllDepts ? "Show Less" : "Detailed Breakdown"} <FiChevronRight size={14} />
+                            {showAllDepts ? t("pay.showLess") : t("pay.breakdown")} <FiChevronRight size={14} />
                         </button>
                     )}
                 </div>
@@ -417,45 +419,45 @@ const Payroll = () => {
             {/* Records table */}
             <div className="bg-[#F9F9F8] border border-gray-200 rounded-xl overflow-hidden">
                 <div className="flex items-center justify-between p-5 flex-wrap gap-3">
-                    <h2 className="text-lg font-bold">Individual Payroll Records</h2>
+                    <h2 className="text-lg font-bold">{t("pay.records")}</h2>
                     <div className="flex items-center gap-2 relative">
                         <button
                             onClick={() => setShowFilters((v) => !v)}
                             className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
                         >
-                            <FiFilter size={14} /> Filter
+                            <FiFilter size={14} />{t("common.filter")}
                         </button>
                         <button
                             onClick={handleExport}
                             disabled={exporting}
                             className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
                         >
-                            <FiDownload size={14} /> {exporting ? "Exporting..." : "Export CSV"}
+                            <FiDownload size={14} /> {exporting ? t("common.exporting") : t("common.exportCsv")}
                         </button>
 
                         {showFilters && (
                             <div className="absolute right-0 top-12 z-10 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-64 flex flex-col gap-3">
                                 <div>
-                                    <label className="text-xs text-gray-500">Department</label>
+                                    <label className="text-xs text-gray-500">{t("common.department")}</label>
                                     <select
                                         value={deptFilter}
                                         onChange={(e) => setDeptFilter(e.target.value)}
                                         className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm mt-1"
                                     >
-                                        <option value="">All Departments</option>
+                                        <option value="">{t("common.allDepartments")}</option>
                                         {departments.map((d) => (
                                             <option key={d} value={d}>{d}</option>
                                         ))}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-xs text-gray-500">Status</label>
+                                    <label className="text-xs text-gray-500">{t("common.status")}</label>
                                     <select
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
                                         className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm mt-1"
                                     >
-                                        <option value="">All Statuses</option>
+                                        <option value="">{t("common.allStatuses")}</option>
                                         {statuses.map((s) => (
                                             <option key={s} value={s}>{s}</option>
                                         ))}
@@ -473,11 +475,11 @@ const Payroll = () => {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="text-left text-gray-500 text-xs uppercase border-b">
-                            <th className="p-4 font-medium">Employee</th>
-                            <th className="p-4 font-medium">ID</th>
-                            <th className="p-4 font-medium">Status</th>
-                            <th className="p-4 font-medium">Pay Period</th>
-                            <th className="p-4 font-medium">Net Salary</th>
+                            <th className="p-4 font-medium">{t("pay.employee")}</th>
+                            <th className="p-4 font-medium">{t("pay.id")}</th>
+                            <th className="p-4 font-medium">{t("common.status")}</th>
+                            <th className="p-4 font-medium">{t("pay.period")}</th>
+                            <th className="p-4 font-medium">{t("common.netSalary")}</th>
                         </tr>
                     </thead>
                     <tbody className={loading ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
@@ -485,7 +487,7 @@ const Payroll = () => {
                            <SkeletonLoader variant="table" rows={PAGE_SIZE} columns={5} />
                         ) : rows.length === 0 && !loading ? (
                             <tr>
-                                <td colSpan={5} className="p-8 text-center text-gray-400">No records found</td>
+                                <td colSpan={5} className="p-8 text-center text-gray-400">{t("common.noRecords")}</td>
                             </tr>
                         ) : (
                             rows.map((row) => (
@@ -504,7 +506,7 @@ const Payroll = () => {
                                         </div>
                                     </td>
                                     <td className="p-4 text-gray-500">#{row.employeeId}</td>
-                                    <td className="p-4"><StatusBadge status={row.status} /></td>
+                                    <td className="p-4"><StatusBadge status={row.status} label={t(`status.${row.status}`, row.status)} /></td>
                                     <td className="p-4">
                                         {new Date(row.payPeriodStart).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                                         {" – "}

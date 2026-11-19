@@ -1,3 +1,4 @@
+import { usePreferences } from "../context/PreferencesContext"
 /* Components */
 import StatusBadge from "../components/StatusBadge"
 import Pagination from "../components/Pagination"
@@ -24,6 +25,7 @@ const TABLE_NAME = 'Employees';
 const PAGE_SIZE = 5;
 
 const Employees = () => {
+    const { t } = usePreferences()
     const [activeCount, setActiveCount] = useState(0);
     const [onLeaveCount, setOnLeaveCount] = useState(0);
     const [newHiresCount, setNewHiresCount] = useState(0);
@@ -212,8 +214,8 @@ const Employees = () => {
                 {/* Page Header Row */}
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold font-[manrope]">Employee Directory</h1>
-                        <p className="text-gray-500 text-sm">Manage your team across all regions.</p>
+                        <h1 className="text-2xl font-bold font-[manrope]">{t("emp.title")}</h1>
+                        <p className="text-gray-500 text-sm">{t("emp.subtitle")}</p>
                     </div>
                     <div className="flex gap-3">
                         <button
@@ -221,14 +223,14 @@ const Employees = () => {
                             disabled={exporting}
                             className="flex items-center gap-2 px-4 py-2 border-gray-600 rounded-lg text-[#f9f9f8] text-sm font-medium bg-[#2C2C2E] hover:bg-gray-500 transition"
                         >
-                            <FiDownload size={16} /> {exporting ? "Exporting..." : "Export CSV"}
+                            <FiDownload size={16} /> {exporting ? t("common.exporting") : t("common.exportCsv")}
                         </button>
 
                         <button
                             onClick={() => setIsAddModalOpen(true)}
                             className="flex items-center gap-2 px-4 py-2 bg-[#639987] text-[#F9F9F8] rounded-lg text-sm font-medium hover:bg-[#A8C3B9] transition"
                         >
-                            <FiPlus size={16} /> Add Employee
+                            <FiPlus size={16} /> {t("emp.add")}
                         </button>
                     </div>
                 </div>
@@ -237,7 +239,7 @@ const Employees = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-1">
                         <div className="flex items-center justify-between">
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Total Staff</p>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">{t("emp.totalStaff")}</p>
                             
                         </div>
                         <p className="text-2xl font-bold">{totalCount.toLocaleString()}</p>
@@ -245,25 +247,25 @@ const Employees = () => {
 
                     <div className="border border-gray-200 rounded-xl p-4 flex flex-col gap-1">
                         <div className="flex items-center justify-between">
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">On Leave</p>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">{t("status.On Leave")}</p>
                             
                         </div>
                         <div className="flex items-baseline gap-2">
                             <p className="text-2xl font-bold">{onLeaveCount}</p>
                             <span className="text-xs text-[#639987]">
-                                {totalCount > 0 ? `${((onLeaveCount / totalCount) * 100).toFixed(1)}% of total` : ""}
+                                {totalCount > 0 ? `${((onLeaveCount / totalCount) * 100).toFixed(1)}% ${t("emp.ofTotal")}` : ""}
                             </span>
                         </div>
                     </div>
 
                     <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-1">
                         <div className="flex items-center justify-between">
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">New Hires</p>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">{t("emp.newHires")}</p>
                             
                         </div>
                         <div className="flex items-baseline gap-2">
                             <p className="text-2xl font-bold">{newHiresCount}</p>
-                            <span className="text-xs text-[#639987] font-medium">This Month</span>
+                            <span className="text-xs text-[#639987] font-medium">{t("emp.thisMonth")}</span>
                         </div>
                     </div>
 
@@ -321,13 +323,13 @@ const Employees = () => {
                                                 return new Set(employees.map((emp) => emp.id));
                                             });
                                         }}
-                                    /> Employee Name
+                                    /> {t("emp.name")}
                                 </th>
-                                <th className="p-4 font-medium">Department</th>
-                                <th className="p-4 font-medium">Join Date</th>
-                                <th className="p-4 font-medium">Role</th>
-                                <th className="p-4 font-medium">Status</th>
-                                <th className="p-4 font-medium">Actions</th>
+                                <th className="p-4 font-medium">{t("common.department")}</th>
+                                <th className="p-4 font-medium">{t("common.joinDate")}</th>
+                                <th className="p-4 font-medium">{t("common.role")}</th>
+                                <th className="p-4 font-medium">{t("common.status")}</th>
+                                <th className="p-4 font-medium">{t("common.actions")}</th>
                             </tr>
                         </thead>
 
@@ -338,7 +340,7 @@ const Employees = () => {
                                 </tr>
                             ) : employees.length === 0 && !loading ? (
                                 <tr>
-                                    <td colSpan={6} className="p-8 text-center text-gray-400">No Employees Found</td>
+                                    <td colSpan={6} className="p-8 text-center text-gray-400">{t("emp.none")}</td>
                                 </tr>
                             ) : (
                                 employees.map((emp) => {
@@ -423,8 +425,8 @@ const Employees = () => {
 
             <ConfirmDialog
                 isOpen={!!deletingEmployee}
-                title="Delete this employee?"
-                message={deletingEmployee ? `"${deletingEmployee.fullName}" will be permanently removed from the system.` : ""}
+                title={t("emp.deleteTitle")}
+                message={deletingEmployee ? t("emp.deleteMsg", { name: deletingEmployee.fullName }) : ""}
                 onConfirm={handleDeleteConfirmed}
                 onCancel={() => setDeletingEmployee(null)}
                 loading={deleting}
@@ -438,7 +440,7 @@ const Employees = () => {
                         ? `${selectedEmployees.map((emp) => emp.fullName).join(", ")} will be permanently removed from the system.`
                         : ""
                 }
-                confirmLabel="Delete All"
+                confirmLabel={t("common.deleteAll")}
                 onConfirm={handleBulkDeleteConfirmed}
                 onCancel={() => setIsBulkConfirmOpen(false)}
                 loading={bulkDeleting}

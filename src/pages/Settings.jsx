@@ -120,12 +120,13 @@ const Settings = () => {
         setSaving(true)
         try {
             const { theme: nextTheme, language: nextLanguage, ...payload } = form
+            // Theme/language are device-level and must apply even if the DB write fails
+            setTheme(nextTheme)
+            setLanguage(nextLanguage)
             const row = settingsId
                 ? await settingsCRUD.update(settingsId, payload)
                 : await settingsCRUD.create(payload)
             setSettingsId(row?.id ?? settingsId)
-            setTheme(nextTheme)
-            setLanguage(nextLanguage)
             setSaved(form)
             showToast("Settings saved successfully!", "success")
         } catch (err) {

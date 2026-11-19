@@ -11,11 +11,13 @@ import { FaMoneyBills } from "react-icons/fa6";
 import { CiSettings } from "react-icons/ci";
 import { HiMenuAlt2, HiX } from "react-icons/hi";
 import { useAuth } from '../context/AuthContext';
+import { usePreferences } from '../context/PreferencesContext';
 
 const SideBar = () => {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const { user, hrProfile } = useAuth();
+    const { t } = usePreferences();
 
     // hrProfile comes from your "HRemp" table (fullName/role/PhotoUrl columns).
     // user is the raw Supabase auth user, kept only as an email fallback.
@@ -24,14 +26,14 @@ const SideBar = () => {
     const avatarUrl = hrProfile?.PhotoUrl;
 
     const pagesNav = [
-        { name: 'Dashboard', path: '/dashboard', icon: <MdDashboard style={{ color: '#F9F9F8' }} size={18} /> },
-        { name: 'Employees', path: '/employees', icon: <IoMdPeople style={{ color: '#F9F9F8' }} size={18} /> },
-        { name: 'Departments', path: '/departments', icon: <HiOutlineBuildingOffice2 style={{ color: '#F9F9F8' }} size={18} /> },
-        { name: 'Attendance', path: '/attendance', icon: <FaRegCalendarCheck style={{ color: '#F9F9F8' }} size={18} /> },
-        { name: "Leave Request", path: '/leave-request', icon: <FaRegCalendarTimes style={{ color: '#F9F9F8' }} size={18} /> },
-        { name: 'Payroll', path: '/payroll', icon: <FaMoneyBills style={{ color: '#F9F9F8' }} size={18} /> },
-        { name: 'Reports', path: '/reports', icon: <MdInsertChartOutlined style={{ color: '#F9F9F8' }} size={18} /> },
-        { name: 'Settings', path: '/settings', icon: <CiSettings style={{ color: '#F9F9F8' }} size={18} /> },
+        { key: 'nav.dashboard', path: '/dashboard', icon: <MdDashboard style={{ color: '#F9F9F8' }} size={18} /> },
+        { key: 'nav.employees', path: '/employees', icon: <IoMdPeople style={{ color: '#F9F9F8' }} size={18} /> },
+        { key: 'nav.departments', path: '/departments', icon: <HiOutlineBuildingOffice2 style={{ color: '#F9F9F8' }} size={18} /> },
+        { key: 'nav.attendance', path: '/attendance', icon: <FaRegCalendarCheck style={{ color: '#F9F9F8' }} size={18} /> },
+        { key: 'nav.leave', path: '/leave-request', icon: <FaRegCalendarTimes style={{ color: '#F9F9F8' }} size={18} /> },
+        { key: 'nav.payroll', path: '/payroll', icon: <FaMoneyBills style={{ color: '#F9F9F8' }} size={18} /> },
+        { key: 'nav.reports', path: '/reports', icon: <MdInsertChartOutlined style={{ color: '#F9F9F8' }} size={18} /> },
+        { key: 'nav.settings', path: '/settings', icon: <CiSettings style={{ color: '#F9F9F8' }} size={18} /> },
     ];
 
     // On desktop, expanded = hovered. On mobile, expanded = opened (labels always show when open).
@@ -124,7 +126,7 @@ const SideBar = () => {
                                         transition={{ duration: 0.2 }}
                                         className="text-sm font-[inter] whitespace-nowrap overflow-hidden"
                                     >
-                                        {page.name}
+                                        {t(page.key)}
                                     </motion.span>
                                 )}
                             </AnimatePresence>

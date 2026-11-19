@@ -1,3 +1,4 @@
+import { usePreferences } from "../context/PreferencesContext"
 //Components
 import Pagination from "../components/Pagination"
 import AttendanceFormModal from "../components/AttendanceFormModal"
@@ -55,17 +56,18 @@ const statusStyles = {
     Absent: "bg-gray-100 text-gray-500"
 }
 
-const AttendaceBadge = ({status, lateMinutes}) => (
+const AttendaceBadge = ({status, lateMinutes, label}) => (
     <span
     className={`px-3 py-1 rounded text-xs font-medium inline-block 
         ${statusStyles[status] || "bg-gray-100 text-gray-700"} `} >
          {status === "Late" && lateMinutes ? 
-        `Late (${Math.round(lateMinutes)}m)` : status 
+        `${label} (${Math.round(lateMinutes)}m)` : label 
         }   
              </span>
 );
 
 const Attendance = () => {
+    const { t } = usePreferences()
     const {showToast} = useToast();
 
     const [selectDate, setSelectDate] = useState(todayISO())
@@ -297,8 +299,8 @@ const Attendance = () => {
             {/* Header */}
             <header className="flex items-center justify-between flex-wrap gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold">Attendance Monitoring</h1>
-                    <p className = "text-gray-500 text-sm">Real-time over sight of enterprise workforce presence and punctuality</p>
+                    <h1 className="text-2xl font-bold">{t("att.title")}</h1>
+                    <p className = "text-gray-500 text-sm">{t("att.subtitle")}</p>
                 </div>
 
                 <button
@@ -306,7 +308,7 @@ const Attendance = () => {
                 disabled = {exporting}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg text-[#F9F9F8] text-sm font-medium bg-[#2C2C2E] hover:bg-gray-600 transition"
                 >
-                    <FiDownload size={16}/> {exporting ? "Exporting......" : "Export Report"}
+                    <FiDownload size={16}/> {exporting ? t("common.exporting") : t("common.exportReport")}
                 </button>
             </header>
 
@@ -316,7 +318,7 @@ const Attendance = () => {
                 <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-1">
                     <div className="flex items-center justify-between">
                         <p className="text-sm text-gray-500 uppercase tracking-wide">
-                            Total Present
+                            {t("att.totalPresent")}
                             </p>
                             <HiOutlineUserGroup className="text-[#639987]" size= {18} />
                     </div>
@@ -328,7 +330,7 @@ const Attendance = () => {
                 <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-1">
                     <div className="flex items-center justify-between">
                         <p className="text-sm text-gray-500 uppercase tracking-wide">
-                            Total Late
+                            {t("att.totalLate")}
                             </p>
                             <FiClock className="text-[#639987]" size= {18} />
                     </div>
@@ -340,7 +342,7 @@ const Attendance = () => {
                 <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-1">
                     <div className="flex items-center justify-between">
                         <p className="text-sm text-gray-500 uppercase tracking-wide">
-                            Total Absent
+                            {t("att.totalAbsent")}
                             </p>
                             <FiUserX className="text-[#639987]" size= {18} />
                     </div>
@@ -352,7 +354,7 @@ const Attendance = () => {
                 <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-1">
                     <div className="flex items-center justify-between">
                         <p className="text-sm text-gray-500 uppercase tracking-wide">
-                           Avg. Working Hours
+                           {t("att.avgHours")}
                             </p>
                             <BsStopwatch className="text-[#639987]" size= {18} />
                     </div>
@@ -378,7 +380,7 @@ const Attendance = () => {
                 onChange={e => setDeptFilter(e.target.value)}
                 className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
                 >
-                    <option value="">All Departments</option>
+                    <option value="">{t("common.allDepartments")}</option>
                     {departments.map(d => (
                         <option key = {d} value={d}>{d}</option>
                     ))}
@@ -391,15 +393,15 @@ const Attendance = () => {
                      onChange={e => setStatusFilter(e.target.value)}
                      className="outline-none bg-transparent"
                      >
-                        <option value="">All Statuses</option>
-                        <option value="Present">Present</option>
-                        <option value="Late">Late</option>
-                        <option value="Absent">Absent</option>
+                        <option value="">{t("common.allStatuses")}</option>
+                        <option value="Present">{t("status.Present")}</option>
+                        <option value="Late">{t("status.Late")}</option>
+                        <option value="Absent">{t("status.Absent")}</option>
                      </select>
                 </label>
 
                 <p className="ml-auto text-sm text-gray-500">
-                    Showing {totalCount.toLocaleString()} records
+                    {t("att.showing")} {totalCount.toLocaleString()} {t("att.records")}
                 </p>
             </div>
 
@@ -412,13 +414,13 @@ const Attendance = () => {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="text-left text-gray-500 text-xs uppercase border-b">
-                                <th className="p-4 font-medium">Employee Name</th>
-                                <th className="p-4 font-medium">Date</th>
-                                <th className="p-4 font-medium">Check-In</th>
-                                <th className="p-4 font-medium">Check-Out</th>
-                                <th className="p-4 font-medium">Working Hours</th>
-                                <th className="p-4 font-medium">Status</th>
-                                <th className="p-4 font-medium">Action</th>
+                                <th className="p-4 font-medium">{t("emp.name")}</th>
+                                <th className="p-4 font-medium">{t("common.date")}</th>
+                                <th className="p-4 font-medium">{t("att.checkIn")}</th>
+                                <th className="p-4 font-medium">{t("att.checkOut")}</th>
+                                <th className="p-4 font-medium">{t("att.hours")}</th>
+                                <th className="p-4 font-medium">{t("common.status")}</th>
+                                <th className="p-4 font-medium">{t("common.action")}</th>
                             </tr>
                         </thead>
  
@@ -427,7 +429,7 @@ const Attendance = () => {
                               <SkeletonLoader variant="table" rows={PAGE_SIZE} columns={7} />
                             ) : rows.length === 0 && !loading ? (
                                 <tr>
-                                    <td colSpan={7} className="p-8 text-center text-gray-400">No records found for this day</td>
+                                    <td colSpan={7} className="p-8 text-center text-gray-400">{t("att.none")}</td>
                                 </tr>
                             ) : (
                                 rows.map((row) => (
@@ -454,7 +456,7 @@ const Attendance = () => {
                                         <td className="p-4">{formatTime(row.checkOut)}</td>
                                         <td className="p-4">{formatMinutes(workingMinutes(row.checkIn, row.checkOut))}</td>
                                         <td className="p-4">
-                                            <AttendaceBadge status={row.status} lateMinutes={row.lateMinutes} />
+                                            <AttendaceBadge status={row.status} lateMinutes={row.lateMinutes} label={t(`status.${row.status}`, row.status)} />
                                         </td>
                                         <td className="p-4">
                                             <div className="flex gap-3 items-center">
@@ -484,17 +486,17 @@ const Attendance = () => {
                 {/* Trend chart + alert */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                     <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-5">
-                        <h2 className="text-lg font-bold mb-4">Punctuality Trends</h2>
+                        <h2 className="text-lg font-bold mb-4">{t("att.trends")}</h2>
                         <div className="bg-gray-50 rounded-lg p-4 h-[220px] flex items-end justify-between ">
                             {trend.length === 0 ? (
-                                <p className="text-sm text-gray-400 m-auto">No data yet for this range</p>
+                                <p className="text-sm text-gray-400 m-auto">{t("att.noTrend")}</p>
                             ) : (
                                <Bar 
                                data = {{
                                 labels: trend.map(t => t.isSelected ? `${t.label} (Selected)` : t.label),
                                 datasets: [
                                     {
-                                        label: "Present",
+                                        label: t("status.Present"),
                                         data: trend.map(t => t.present),
                                         backgroundColor: trend.map(t => t.isSelected ? '#2f4f42' : '#a8c3b9'),
                                         borderRadius: 6, 
@@ -536,7 +538,7 @@ const Attendance = () => {
 
                     {alert && !alertDismissed && (
                         <div className="bg-[#2f4f42] text-white rounded-xl p-5 flex flex-col gap-4">
-                            <h2 className="text-lg font-bold">Automated Alert</h2>
+                            <h2 className="text-lg font-bold">{t("att.alert")}</h2>
                             <p className="text-sm text-white/80">
                             {alert.dept} team has {alert.count} employee{alert.count > 1 ? "s" : ""} currently late.
                             </p>
@@ -546,14 +548,14 @@ const Attendance = () => {
                                 onClick={() => showToast(`Leads notified about ${alert.dept} lateness`, "info")}
                                 className="bg-white text-[#2f4f42] rounded-lg py-2 text-sm font-medium hover:bg-gray-100"
                                 >
-                                    Notify Leads
+                                    {t("att.notify")}
                                 </button>
 
                                 <button
                                 onClick={() => setAlertDismissed(true)}
                                  className="border border-white/30 rounded-lg py-2 text-sm font-medium hover:bg-white/10"
                                 >
-                                    Dismiss All
+                                    {t("att.dismissAll")}
                                 </button>
                             </div>
                         </div>
@@ -570,7 +572,7 @@ const Attendance = () => {
 
         <ConfirmDialog
         isOpen={!!deletingRecord}
-        title= "Delete this record?"
+        title={t("att.deleteTitle")}
         message={deletingRecord ? `Attendance for "${deletingRecord.Employees?.fullName}" on ${deletingRecord.date} will be Premanently removed` : ""}
         onCancel={() => setDeletingRecord(null)}
         onConfirm={handleDeleteConfirmed}

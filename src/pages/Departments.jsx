@@ -1,3 +1,4 @@
+import { usePreferences } from "../context/PreferencesContext"
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { useOutletContext, useNavigate } from 'react-router-dom'
@@ -13,6 +14,7 @@ import ConfirmDialog from '../components/CofirmDialog'
 
 
 const Departments = () => {
+    const { t } = usePreferences()
     const { search } = useOutletContext()
     const navigate = useNavigate();
     const { showToast } = useToast();
@@ -75,7 +77,7 @@ const Departments = () => {
         }
     };
 
-    const sortLabel = sortBy === "alphabetical" ? "Alphabetical" : sortBy === "mostEmployees" ? "Most Employees" : "Fewest Employees";
+    const sortLabel = sortBy === "alphabetical" ? t("dept.alpha") : sortBy === "mostEmployees" ? t("dept.most") : t("dept.fewest");
 
     return (
         <motion.section
@@ -86,9 +88,9 @@ const Departments = () => {
         >
             <div className='flex items-center justify-between flex-wrap gap-4'>
                 <div>
-                    <h1 className='text-2xl font-bold '>Organization Units</h1>
+                    <h1 className='text-2xl font-bold '>{t("dept.title")}</h1>
                     <p className='text-gray-500 text-sm'>
-                        Manage departmental hierarchies and team distribution across the enterprise.
+                        {t("dept.subtitle")}
                     </p>
                 </div>
 
@@ -96,7 +98,7 @@ const Departments = () => {
                     onClick={() => setIsCreateOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 bg-[#639987] text-[#F9F9F8] rounded-lg text-sm font-medium hover:bg-[#557f70] transition"
                 >
-                    <FiPlus size={16} /> Create Department
+                    <FiPlus size={16} /> {t("dept.create")}
                 </button>
             </div>
 
@@ -106,10 +108,10 @@ const Departments = () => {
                         onClick={() => setIsFilterOpen((prev) => !prev)}
                         className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50"
                     >
-                        <FiFilter size={14} /> Filter{category ? `: ${category}` : ""}
+                        <FiFilter size={14} /> {t("common.filter")}{category ? `: ${category}` : ""}
                     </button>
                     <span className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600">
-                        Sort: {sortLabel}
+                        {t("common.sort")}: {sortLabel}
                     </span>
 
                     {isFilterOpen && (
@@ -123,7 +125,7 @@ const Departments = () => {
                     )}
                 </div>
                 <p className="text-sm text-gray-500">
-                    Total Departments: {filteredDepartments.length} · Active Managers: {activeManagerCount}
+                    {t("dept.total")}: {filteredDepartments.length} · {t("dept.managers")}: {activeManagerCount}
                 </p>
             </div>
 
@@ -135,7 +137,7 @@ const Departments = () => {
                 {loading ? (
                       <SkeletonLoader variant="cards" count={6} />
                 ) : filteredDepartments.length === 0 ? (
-                    <p className='text-gray-400 col-span-full text-center py-8'>No departments found.</p>
+                    <p className='text-gray-400 col-span-full text-center py-8'>{t("dept.none")}</p>
                 ) : (
                     filteredDepartments.map((dept) => (
                         <div
@@ -151,7 +153,7 @@ const Departments = () => {
                             >
                                   <h3 className='font-semibold text-xl hover:text-[#639987] transition cursor-pointer'>{dept.DeptName}</h3>
                                 <p className='text-sm text-gray-500 flex items-center gap-1'>
-                                    {dept.NoEmployees} Employees
+                                    {dept.NoEmployees} {t("dept.employees")}
                                 </p>
                             </button>
                             
@@ -170,8 +172,8 @@ const Departments = () => {
 
                                 <div className='w-full flex justify-between items-center'>
                                     <div>
-                                        <p className='text-xs text-gray-400'>Head of Dept.</p>
-                                        <p className='text-sm font-medium'>{dept.Employees?.fullName ?? "Unassigned"}</p>
+                                        <p className='text-xs text-gray-400'>{t("dept.head")}</p>
+                                        <p className='text-sm font-medium'>{dept.Employees?.fullName ?? t("dept.unassigned")}</p>
                                     </div>
 
                                     <div className='flex gap-2'>
@@ -198,8 +200,8 @@ const Departments = () => {
 
             <ConfirmDialog
                 isOpen={!!deletingDept}
-                title="Delete this department?"
-                message={deletingDept ? `"${deletingDept.DeptName}" will be permanently removed.` : ""}
+                title={t("dept.deleteTitle")}
+                message={deletingDept ? t("dept.deleteMsg", { name: deletingDept.DeptName }) : ""}
                 onConfirm={handleDeleteDept}
                 onCancel={() => setDeletingDept(null)}
                 loading={removingDept}

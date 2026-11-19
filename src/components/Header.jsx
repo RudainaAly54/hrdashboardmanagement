@@ -1,21 +1,23 @@
+import { usePreferences } from "../context/PreferencesContext"
 import { FiSearch } from "react-icons/fi";
 import { FaRegCalendar } from "react-icons/fa";
 import { CiBellOn } from "react-icons/ci";
 
-const Header = ({ search, onSearchChange, placeholder = "Search employees, ID, or department ....", headerTitle = "Employee Management" }) => {
+const Header = ({ search, onSearchChange, placeholder, headerTitle }) => {
+    const { t } = usePreferences()
   const today = new Date();
   const formattedDate = today.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
   return (
     <header className="flex items-center justify-evenly gap-3 px-6 py-4 border-b md:w-full">
-      <h2 className="hidden md:block text-2xl  font-bold">{headerTitle}</h2>
+      <h2 className="hidden md:block text-2xl  font-bold">{headerTitle ?? t("header.title")}</h2>
       <div className="relative w-full max-w-md">
         <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
         <input
           type="text"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t("header.placeholder")}
           className="min-w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#A8C3B9]"
         />
       </div>

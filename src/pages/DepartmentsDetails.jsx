@@ -1,3 +1,4 @@
+import { usePreferences } from "../context/PreferencesContext"
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -12,6 +13,7 @@ import { FiArrowLeft, FiEdit2, FiTrash2 } from "react-icons/fi";
 import SkeletonLoader from "../components/SkeletonLoader";
 
 const DepartmentsDetails = () => {
+    const { t } = usePreferences()
     const { id } = useParams();
     const navigate = useNavigate();
     const { showToast } = useToast();
@@ -116,7 +118,7 @@ const DepartmentsDetails = () => {
                     onClick={() => navigate("/departments")}
                     className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
                 >
-                    <FiArrowLeft size={16} /> Back to Departments
+                    <FiArrowLeft size={16} />{t("dept.back")}
                 </button>
 
                 <div className="flex gap-3">
@@ -124,13 +126,13 @@ const DepartmentsDetails = () => {
                         onClick={() => setIsEditDeptOpen(true)}
                         className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50"
                     >
-                        <FiEdit2 size={14} /> Edit Department
+                        <FiEdit2 size={14} /> {t("dept.editDept")}
                     </button>
                     <button
                         onClick={() => setIsDeleteDeptOpen(true)}
                         className="flex items-center gap-2 px-4 py-2 border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50"
                     >
-                        <FiTrash2 size={14} /> Delete
+                        <FiTrash2 size={14} /> {t("common.delete")}
                     </button>
                 </div>
             </div>
@@ -142,9 +144,9 @@ const DepartmentsDetails = () => {
                         
                     </div>
                     <p className="text-gray-500 text-sm mt-1">
-                        Head of Dept.{" "}
+                        {t("dept.head")}{" "}
                         <span className="font-medium text-gray-700">
-                            {department.Employees?.fullName ?? "Unassigned"}
+                            {department.Employees?.fullName ?? t("dept.unassigned")}
                         </span>
                     </p>
                 </div>
@@ -152,19 +154,19 @@ const DepartmentsDetails = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
-                    <p className="text-xs text-gray-500 uppercase">Category</p>
+                    <p className="text-xs text-gray-500 uppercase">{t("common.category")}</p>
                     <p className="text-2xl font-bold mt-1">{department.core}</p>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
-                    <p className="text-xs text-gray-500 uppercase">Total Employees</p>
+                    <p className="text-xs text-gray-500 uppercase">{t("dept.totalEmployees")}</p>
                     <p className="text-2xl font-bold mt-1">{employees.length}</p>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
-                        <p className="text-xs text-gray-500 uppercase">Active</p>
+                        <p className="text-xs text-gray-500 uppercase">{t("dept.active")}</p>
                     <p className="text-2xl font-bold mt-1">{activeCount}</p>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
-                        <p className="text-xs text-gray-500 uppercase">Total Salary / Month</p>
+                        <p className="text-xs text-gray-500 uppercase">{t("dept.totalSalary")}</p>
                     <p className="text-2xl font-bold mt-1">
                         {totalSalary.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 })}
                     </p>
@@ -175,19 +177,19 @@ const DepartmentsDetails = () => {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="text-left text-gray-500 text-xs uppercase border-b">
-                            <th className="p-4 font-medium">Employee Name</th>
-                            <th className="p-4 font-medium">Role</th>
-                            <th className="p-4 font-medium">City</th>
-                            <th className="p-4 font-medium">Salary</th>
-                            <th className="p-4 font-medium">Status</th>
-                            <th className="p-4 font-medium">Actions</th>
+                            <th className="p-4 font-medium">{t("emp.name")}</th>
+                            <th className="p-4 font-medium">{t("common.role")}</th>
+                            <th className="p-4 font-medium">{t("common.city")}</th>
+                            <th className="p-4 font-medium">{t("common.salary")}</th>
+                            <th className="p-4 font-medium">{t("common.status")}</th>
+                            <th className="p-4 font-medium">{t("common.actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {employees.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className="p-8 text-center text-gray-400">
-                                    No employees in this department yet.
+                                    {t("dept.empty")}
                                 </td>
                             </tr>
                         ) : (
@@ -221,14 +223,14 @@ const DepartmentsDetails = () => {
                                             <button
                                                 onClick={() => setEditingEmployee(emp)}
                                                 className="text-gray-400 hover:text-[#639987]"
-                                                title="Edit employee"
+                                                title={t("common.edit")}
                                             >
                                                 <FiEdit2 size={16} />
                                             </button>
                                             <button
                                                 onClick={() => setDeletingEmployee(emp)}
                                                 className="text-gray-400 hover:text-red-600"
-                                                title="Remove employee"
+                                                title={t("common.remove")}
                                             >
                                                 <FiTrash2 size={16} />
                                             </button>
@@ -259,7 +261,7 @@ const DepartmentsDetails = () => {
 
             <ConfirmDialog
                 isOpen={isDeleteDeptOpen}
-                title="Delete this department?"
+                title={t("dept.deleteTitle")}
                 message={`"${department.DeptName}" will be permanently removed. Employees currently in it will keep their department name but no longer link to a department record.`}
                 onConfirm={handleDeleteDept}
                 onCancel={() => setIsDeleteDeptOpen(false)}
@@ -268,8 +270,8 @@ const DepartmentsDetails = () => {
 
             <ConfirmDialog
                 isOpen={!!deletingEmployee}
-                title="Remove this employee?"
-                message={deletingEmployee ? `"${deletingEmployee.fullName}" will be permanently removed from the system.` : ""}
+                title={t("dept.removeTitle")}
+                message={deletingEmployee ? t("emp.deleteMsg", { name: deletingEmployee.fullName }) : ""}
                 onConfirm={handleDeleteEmployee}
                 onCancel={() => setDeletingEmployee(null)}
                 loading={removingEmployee}

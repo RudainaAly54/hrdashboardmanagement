@@ -1,3 +1,4 @@
+import { usePreferences } from "../context/PreferencesContext"
 import { useMemo, useState } from "react"
 import LeaveRequestFormModal from '../components/LeaveRequestFormModal'
 import { motion } from "framer-motion"
@@ -19,11 +20,11 @@ const statusStyle = {
     Declined: "bg-red-100 text-red-7000"
 }
 
-const StatusPill = ({status}) => (
+const StatusPill = ({status, label}) => (
     <span className= {`flex  items-center justify-center gap-2 px-3 py-1 rounded-3xl ${status === "Pending"  ? statusStyle.pending: ""} 
     ${status === "Declined" ? statusStyle.Declined: ""} ${statusStyle.Approved}
     `}> 
-        {status === "Pending" && <FiClock Size={12}/> } {status}
+        {status === "Pending" && <FiClock Size={12}/> } {label ?? status}
          </span>
 )
 
@@ -44,6 +45,7 @@ const durationDays = (start, end) => {
 }
 
 const LeaveRequest = () => {
+    const { t } = usePreferences()
     const {hrProfile} = useAuth();
     const {showToast} = useToast()
 
@@ -139,8 +141,8 @@ const LeaveRequest = () => {
        >
         <div className="flex items-center justify-between flex-wrap gap-4" >
             <div>
-                <h1 className="text-2xl font-bold">Leave Requests</h1>
-                <p className="text-gray-500 text-sm">Manage and review employee time-off applications</p>
+                <h1 className="text-2xl font-bold">{t("leave.title")}</h1>
+                <p className="text-gray-500 text-sm">{t("leave.subtitle")}</p>
             </div>
 
             <div className="flex gap-3">
@@ -149,7 +151,7 @@ const LeaveRequest = () => {
                 disabled = {exporting}
                 className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium bg-white hover:bg-gray-50"
                 >
-                    <FiDownload size= {16}/ > {exporting ? "Exporting...." : "Export CSV"}
+                    <FiDownload size= {16}/ > {exporting ? t("common.exporting") : t("common.exportCsv")}
                 </button>
                 <button
                 onClick={() => ssetIsNewRequestOpen(true)}
@@ -196,29 +198,29 @@ const LeaveRequest = () => {
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-b py-4 my-4 text-sm">
                             <div>
-                                <p className="text-xs text-gray-400 uppercast">Leave type</p>
+                                <p className="text-xs text-gray-400 uppercast">{t("leave.type")}</p>
                                 <p className="font-semibold mt-1">{featured.leaveType}</p>
                             </div>
 
                             <div>
-                                <p className="text-xs text-gray-400 uppercast">Duration</p>
+                                <p className="text-xs text-gray-400 uppercast">{t("leave.duration")}</p>
                                 <p className="font-semibold mt-1">{durationDays(featured.startDate, featured.endDate)}</p>
                             </div>
 
                             <div>
-                                <p className="text-xs text-gray-400 uppercast">Start Date</p>
+                                <p className="text-xs text-gray-400 uppercast">{t("leave.start")}</p>
                                 <p className="font-semibold mt-1">{new Date(featured.startDate).toLocaleDateString('en-US', {month: "short", day: "numeric", year: "numeric"})}</p>
                             </div>
 
                             <div>
-                                <p className="text-xs text-gray-400 uppercast">End Date</p>
+                                <p className="text-xs text-gray-400 uppercast">{t("leave.end")}</p>
                                 <p className="font-semibold mt-1">{new Date(featured.endDate).toLocaleDateString('en-US', {month: "short", day: "numeric", year: "numeric"})}</p>
                             </div>
                         </div>
 
                         {featured.reason && (
                             <div className="mb-4">
-                                <p className="text-xs text-gray-400 uppercase mb-1">Reason</p>
+                                <p className="text-xs text-gray-400 uppercase mb-1">{t("leave.reason")}</p>
                                 <p className="text-sm italic text-gray-600">"{featured.reason}</p>
                             </div>
                         )}
@@ -229,7 +231,7 @@ const LeaveRequest = () => {
                             disabled = {actingId === featured.id}
                             className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
                             >
-                                Decline
+                                {t("leave.decline")}
                             </button>
                             <button
                             onClick={() => handleDecision(featured, "Approved")}
@@ -262,7 +264,7 @@ const LeaveRequest = () => {
                                     </div>
 
                                     {r.urgent && (
-                                        <span className="px-2 py-1 rounded-full bg-red-100  text-red-600 text-[10px] font-semibold uppercase">Urgent</span>
+                                        <span className="px-2 py-1 rounded-full bg-red-100  text-red-600 text-[10px] font-semibold uppercase">{t("leave.urgent")}</span>
                                     )}
                                 </div>
 
@@ -274,7 +276,7 @@ const LeaveRequest = () => {
                                     disabled = {actingId === r.id}
                                     className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
                                     >
-                                        Decline
+                                        {t("leave.decline")}
                                     </button>
 
                                     <button
@@ -282,7 +284,7 @@ const LeaveRequest = () => {
                                     disabled = {actingId === r.id}
                                     className="px-3 py-1.5 text-xs font-medium bg-[#639987] text-[#f9f9f8] rounded-lg hover:bg-[#557f70] disabled:opacity-50"
                                     >
-                                        Approve
+                                        {t("leave.approve")}
                                     </button>
                               
                                 </div>
@@ -295,7 +297,7 @@ const LeaveRequest = () => {
               {/* Right side  */}
               <div className="flex flex-col gap-5">
                 <div className="bg-white corder border-gray-200 rounded-xl p-5">
-                 <h2 className="text-lg font-bold mb-4">Request Overview</h2>
+                 <h2 className="text-lg font-bold mb-4">{t("leave.overview")}</h2>
 
                  <div className="flex flex-col gap-3">
                     <div className="bg-[#f9f9f8] rounded-lg  p-4 flex items-center justify-between">
@@ -305,7 +307,7 @@ const LeaveRequest = () => {
                           </div>
 
                           <div> 
-                            <p className="text-xs text-gray-500">Pending Requests</p>
+                            <p className="text-xs text-gray-500">{t("leave.pending")}</p>
                             <p className="text-2xl font-bold">{pendingCount}</p>
                           </div>
                         </div>
@@ -319,14 +321,14 @@ const LeaveRequest = () => {
                         </div>
 
                         <div>
-                            <p className="text-xs text-gray-500">Approved (Month)</p>
+                            <p className="text-xs text-gray-500">{t("leave.approvedMonth")}</p>
                             <p className="text-2xl font-bold">{approvedThisMonth}</p>
                         </div>
                     </div>
                  </div>
 
                  <div className="mt-5 pt-4 border-t">
-                    <p className="text-xs text-gray-400 uppercase mb-2">Quick Filter</p>
+                    <p className="text-xs text-gray-400 uppercase mb-2">{t("leave.quick")}</p>
                     <div className="flex flex-wrap gap-2 ">
                         {QUICK_FILTERS.map(f => (
                             <button
@@ -344,10 +346,10 @@ const LeaveRequest = () => {
                 </div>
 
                 <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="text-lg font-bold mb-4">Recent Actions</h3>
+                    <h3 className="text-lg font-bold mb-4">{t("leave.recent")}</h3>
 
                     {recentActions.length === 0 ? (
-                        <p className="text-sm text-gray-400">No actions yet.</p>
+                        <p className="text-sm text-gray-400">{t("leave.noActions")}</p>
                     ): (
                         <div className="flex flex-col gap-4">
                             {recentActions.map(r => (

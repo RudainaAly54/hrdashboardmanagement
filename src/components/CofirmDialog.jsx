@@ -1,6 +1,8 @@
+import { usePreferences } from "../context/PreferencesContext"
 import { FiAlertTriangle } from "react-icons/fi";
 
-const ConfirmDialog = ({ isOpen, title, message, confirmLabel = "Delete", onConfirm, onCancel, loading }) => {
+const ConfirmDialog = ({ isOpen, title, message, confirmLabel, onConfirm, onCancel, loading }) => {
+    const { t } = usePreferences()
     if (!isOpen) return null;
 
     return (
@@ -22,14 +24,14 @@ const ConfirmDialog = ({ isOpen, title, message, confirmLabel = "Delete", onConf
                         disabled={loading}
                         className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-lg disabled:opacity-50"
                     >
-                        Cancel
+                        {t("common.cancel")}
                     </button>
                     <button
                         onClick={onConfirm}
                         disabled={loading}
                         className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
                     >
-                        {loading ? "Deleting..." : confirmLabel}
+                        {loading ? t("common.deleting") : (confirmLabel ?? t("common.delete"))}
                     </button>
                 </div>
             </div>

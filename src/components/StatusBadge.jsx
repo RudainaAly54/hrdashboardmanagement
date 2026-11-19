@@ -1,3 +1,4 @@
+import { usePreferences } from "../context/PreferencesContext"
 const statusStyles = {
     Active: " text-green-700",
     "On Leave": "text-yellow-700",
@@ -6,11 +7,12 @@ const statusStyles = {
 };
 
 const StatusBadge = ({ status }) => {
+    const { t } = usePreferences()
     const colorClasses = statusStyles[status] || "bg-gray-100 text-gray-700";
 
     return (
         <span className={`px-3 py-1 rounded-full text-xs font-medium inline-block ${colorClasses}`}>
-            {status}
+            {t(`status.${status}`, status)}
         </span>
     );
 };

@@ -1,3 +1,4 @@
+import { usePreferences } from "../context/PreferencesContext"
 import { useState, useEffect } from "react";
 import { createClient } from "../lib/supabaseClient";
 
@@ -6,6 +7,7 @@ const supabase = createClient();
 const STATUS_OPTIONS = ["Active", "On Leave", "Terminated", "Remote"];
 
 const MoreFiltersPanel = ({ onApply, onClose }) => {
+    const { t } = usePreferences()
     const [departments, setDepartments] = useState([]);
     const [cities, setCities] = useState([]);
     const [selectedDept, setSelectedDept] = useState("");
@@ -37,50 +39,50 @@ const MoreFiltersPanel = ({ onApply, onClose }) => {
     return (
         <div className="absolute z-40 top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg p-4 w-72 flex flex-col gap-4">
             <div>
-                <label className="text-xs text-gray-500 uppercase">Department</label>
+                <label className="text-xs text-gray-500 uppercase">{t("common.department")}</label>
                 <select
                     value={selectedDept}
                     onChange={(e) => setSelectedDept(e.target.value)}
                     className="w-full mt-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
                 >
-                    <option value="">Any</option>
+                    <option value="">{t("common.any")}</option>
                     {departments.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
             </div>
 
             <div>
-                <label className="text-xs text-gray-500 uppercase">Status</label>
+                <label className="text-xs text-gray-500 uppercase">{t("common.status")}</label>
                 <select
                     value={selectedStatus}
                     onChange={(e) => setSelectedStatus(e.target.value)}
                     className="w-full mt-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
                 >
-                    <option value="">Any</option>
+                    <option value="">{t("common.any")}</option>
                     {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
             </div>
 
             <div>
-                <label className="text-xs text-gray-500 uppercase">Location</label>
+                <label className="text-xs text-gray-500 uppercase">{t("common.location")}</label>
                 <select
                     value={selectedCity}
                     onChange={(e) => setSelectedCity(e.target.value)}
                     className="w-full mt-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
                 >
-                    <option value="">Any</option>
+                    <option value="">{t("common.any")}</option>
                     {cities.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
             </div>
 
             <div className="flex justify-end gap-2 pt-2 border-t">
                 <button onClick={onClose} className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-lg">
-                    Cancel
+                    {t("common.cancel")}
                 </button>
                 <button
                     onClick={handleApply}
                     className="px-4 py-2 text-sm bg-[#639987] text-[#F9F9F8] rounded-lg hover:bg-[#557f70]"
                 >
-                    Apply
+                    {t("common.apply")}
                 </button>
             </div>
         </div>
