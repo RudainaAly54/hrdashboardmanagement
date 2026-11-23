@@ -6,10 +6,6 @@ import FormModal from "./FormModal";
 
 const supabase = createClient();
 
-const ICON_OPTIONS = [
-    "brain-circuit", "code-2", "layout-dashboard", "database", "shield-check",
-    "smartphone", "cloud", "server", "truck", "shopping-cart", "scale", "megaphone",
-];
 
 const CATEGORY_OPTIONS = ["Technical", "Business", "Operations", "Revenue", "Creative", "Strategic", "Success"];
 
@@ -44,31 +40,21 @@ const DepartmentModal = ({
         {
             DeptName: initialData?.DeptName || "",
             core: initialData?.core || CATEGORY_OPTIONS[0],
-            Icon: initialData?.Icon || ICON_OPTIONS[0],
+            prefix: initialData?.prefix || "", 
             headID: initialData?.headID || "",
         } : {
             DeptName: "",
             core: CATEGORY_OPTIONS[0],
-            Icon: ICON_OPTIONS[0],
+            prefix: "", 
             headID: ""
         }
 
     //Fields
     const fields = [
         { name: "DeptName", label: 'Department Name', required: true, span: 2, placeholder: "e.g. Data Engineering" },
+        { name: "prefix", label: 'ID Prefix', required: true,  placeholder: "e.g. SW" },
         { name: "core", label: "Category", type: "select", options: CATEGORY_OPTIONS },
-        { name: "Icon", label: "Icon", type: "select", options: ICON_OPTIONS },
-        {
-            name: "iconPreview", type: "custom", span: 2,
-            render: (values) => (
-                <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#f0f5f3] flex items-center justify-center">
-                        <IconsComp iconName={values.Icon} className="text-[#639987]" size={20} />
-                    </div>
-                    <p className="text-sm text-gray-500">Icon preview</p>
-                </div>
-            )
-        },
+      
         isEdit
             ? {
                   name: "headID", label: "Head of the Department", type: "select", span: 2,
@@ -89,8 +75,8 @@ const DepartmentModal = ({
     const handleSubmit = async (values) => {
         const payload = {
             DeptName: values.DeptName.trim(),
+            prefix: values.prefix.trim().toUpperCase(),
             core: values.core,
-            Icon: values.Icon,
             headID: isEdit ? (values.headID || null) : null,
         };
 

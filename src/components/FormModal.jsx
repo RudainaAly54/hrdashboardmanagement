@@ -1,22 +1,66 @@
 import { usePreferences } from "../context/PreferencesContext"
-/* Field
-{
-name : "fullName",
-label: "Full Name"
-type: "text" | "email" | "number" | ....| ...
-span: 2                    // Optional - makes the field take both grid col
-required: true        //Optional
-placeholder: "......"   //Optional
+import { useState, useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { FiX, FiChevronDown, FiCheck } from "react-icons/fi";
 
-options : [ ..... ]        //Required ("select") => array or [key: value]
-includeEmpty: true //Optional ("select") => adds a blank/unassigned option
-emptyLabel: "unassigned"
-render: (values, update) => <jsx/> //required for custom
-}
-*/
+const SelectField = ({ value, onChange, options, includeEmpty, emptyLabel }) => {
+    const [open, setOpen] = useState(false);
+    const ref = useRef(null);
 
-import { useState, useEffect } from "react";
-import { FiX } from "react-icons/fi";
+    const items = [
+        ...(includeEmpty ? [{ value: "", label: emptyLabel || "None" }] : []),
+        ...options.map((o) => (typeof o === "object" ? o : { value: o, label: o })),
+    ];
+    const current = items.find((i) => String(i.value) === String(value ?? ""));
+
+    useEffect(() => {
+        const close = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+        document.addEventListener("mousedown", close);
+        return () => document.removeEventListener("mousedown", close);
+    }, []);
+
+    return (
+        <div ref={ref} className="relative mt-1">
+            <button
+                type="button"
+                onClick={() => setOpen((o) => !o)}
+                className="w-full flex items-center justify-between px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-left"
+            >
+                <span className="truncate">{current?.label ?? items[0]?.label ?? "Select..."}</span>
+                <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                    <FiChevronDown size={16} className="text-gray-400" />
+                </motion.span>
+            </button>
+
+            <AnimatePresence>
+                {open && (
+                    <motion.ul
+                        initial={{ opacity: 0, y: -6, scaleY: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scaleY: 1 }}
+                        exit={{ opacity: 0, y: -6, scaleY: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        style={{ transformOrigin: "top" }}
+                        className="absolute z-20 mt-1 w-full max-h-56 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1"
+                    >
+                        {items.map((item) => {
+                            const selected = String(item.value) === String(value ?? "");
+                            return (
+                                <li
+                                    key={String(item.value)}
+                                    onClick={() => { onChange(item.value); setOpen(false); }}
+                                    className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-[#f0f5f3] ${selected ? "text-[#639987] font-medium" : ""}`}
+                                >
+                                    <span className="truncate">{item.label}</span>
+                                    {selected && <FiCheck size={14} />}
+                                </li>
+                            );
+                        })}
+                    </motion.ul>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
 
 const FormModal = ({
     isOpen,
@@ -102,20 +146,13 @@ const FormModal = ({
                                 )}
 
                                 {field.type === "select" ? (
-                                    <select
-                                        value={values[field.name] ?? ""}
-                                        onChange={update(field.name)}
-                                        className="w-full mt-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                                    >
-                                        {field.includeEmpty && (
-                                            <option value="">{field.emptyLabel || "None"}</option>
-                                        )}
-                                        {field.options.map((opt) => {
-                                            const value = typeof opt === "object" ? opt.value : opt;
-                                            const label = typeof opt === "object" ? opt.label : opt;
-                                            return <option key={value} value={value}>{label}</option>;
-                                        })}
-                                    </select>
+                                    <SelectField
+        value={values[field.name]}
+        options={field.options}
+        includeEmpty={field.includeEmpty}
+        emptyLabel={field.emptyLabel}
+        onChange={(v) => update(field.name)({ target: { value: v } })}
+    />
                                 ) : field.type === "custom" ? (
                                     field.render(values, update)
                                 ) : (

@@ -1,10 +1,11 @@
 import { usePreferences } from "../context/PreferencesContext"
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useGetEmployeeByIdQuery, useDeleteEmployeeMutation } from '../store/employeesApi'
 import { useToast } from "../context/ToastContext";
 import EmployeeFormModal from "../components/EmployeeFormModal";
+import NoFound from "./NoFound";
 import ConfirmDialog from "../components/CofirmDialog";
 import { FiArrowLeft, FiEdit2, FiTrash2 } from "react-icons/fi";
 import SkeletonLoader from "../components/SkeletonLoader";
@@ -14,10 +15,12 @@ const EmpDetails = () => {
     const {id} = useParams();
     const navigate = useNavigate();
     const {showToast} = useToast();
+    
 
 const [isEditOpen, setIsEditOpen]  = useState(false)
 const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 const [deleting, setDeleting] = useState(false);
+
 
 const { data: employee, isLoading: loading, error, refetch } = useGetEmployeeByIdQuery(id);
   const message = error;
@@ -44,20 +47,21 @@ const handleDelete = async () => {
     }
 }
 
-if (loading) {
-    return <SkeletonLoader />;
+
+if (loading) return <SkeletonLoader />;
+
+if (message) {
+    return (
+        <div className="p-6">
+            <p className="text-red-600 bg-red-50 rounded-lg p-4">{message}</p>
+            <button onClick={() => navigate("/employees")} className="mt-4 text-sm text-[#639987] hover:underline">
+                ← Back to Employees
+            </button>
+        </div>
+    );
 }
 
-if (message || !employee) {
-     return (
-            <div className="p-6">
-                <p className="text-red-600 bg-red-50 rounded-lg p-4">{message || "Employee not found."}</p>
-                <button onClick={() => navigate("/employees")} className="mt-4 text-sm text-[#639987] hover:underline">
-                    ← Back to Employees
-                </button>
-            </div>
-        );
-}
+if (!employee) return <NoFound />;
 return (
     <motion.section 
     initial = {{opacity: 0, y: 10}}

@@ -1,5 +1,4 @@
 import { usePreferences } from "../context/PreferencesContext"
-/* Components */
 import StatusBadge from "../components/StatusBadge"
 import Pagination from "../components/Pagination"
 import QuickFilters from "../components/QuickFilters";
@@ -15,9 +14,6 @@ import { useToast } from "../context/ToastContext";
 import { employeeCRUD } from "../api/api";
 import { useGetEmployeesPageQuery, useDeleteEmployeeMutation, useBulkDeleteEmployeesMutation } from "../store/employeesApi";
 import { FiDownload, FiPlus, FiEdit2, FiTrash2 } from "react-icons/fi";
-import { FaUsers } from "react-icons/fa";
-import { FaUmbrellaBeach } from "react-icons/fa6";
-import { HiOutlineSparkles } from "react-icons/hi2";
 import SkeletonLoader from "../components/SkeletonLoader";
 
 const supabase = createClient();
@@ -60,11 +56,10 @@ const Employees = () => {
         });
     };
 
-    const { search } = useOutletContext(); // shared search term, owned by Layout
+    const { search } = useOutletContext(); 
     const { showToast } = useToast();
 
-    // reset to page 1 whenever the search term or filters change, so a
-    // narrowed result set never leaves the user on a page that no longer exists.
+
     useEffect(() => {
         setPage(1);
     }, [search, filters]);
@@ -86,11 +81,9 @@ const Employees = () => {
     const [removeEmployee] = useDeleteEmployeeMutation();
     const [bulkDeleteEmployees] = useBulkDeleteEmployeesMutation();
 
-    // Selection only tracks ids currently visible on this page — the names
-    // shown in the bulk confirm dialog come from the loaded `employees` list.
+    
     const selectedEmployees = employees.filter((emp) => selectedIds.has(emp.id));
 
-    // summary card counts — reflects the WHOLE table, not just the current page
     useEffect(() => {
         const fetchSummaryCounts = async () => {
             try {

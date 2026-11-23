@@ -12,6 +12,7 @@ import Payroll from './pages/Payroll'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import Layout from './components/Layout'
+import NoFound from './pages/NoFound'
 /* import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import UnauthorizedPage from './pages/UnauthorizedPage'
@@ -47,6 +48,7 @@ function App() {
         <Route path='/reports' element={<Reports />} />
         <Route path='/settings' element={<Settings />} />
       </Route>
+      <Route  path='*' element={<NoFound/>}/>
     </Routes>
     </main>
   )

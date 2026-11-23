@@ -63,10 +63,10 @@ getPage : async({
         .from(tableName)
         .select(selectQuery)
         .eq(idColumn, id)
-        .single();
+        .maybeSingle();
 
-        if(error) throw error
-        return data
+        if(error && error.code !== "22P02") throw error
+        return data ?? null
     },
 
     //Create New Record
