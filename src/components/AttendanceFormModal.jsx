@@ -1,6 +1,6 @@
 import { attendanceCRUD } from "../api/api";
 import FormModal from "./FormModal";
-import { computeAttendanceStatus, SHIFT_START_TIME } from "../lib/attendanceConfig";
+import { computeAttendanceStatus, SHIFT_START_TIME } from "../lib/AttendanceConfiggit";
 
 // Pull just the HH:MM portion out of a timestamptz value for a <input type="time">
 const toTimeInput = (isoString) => {
